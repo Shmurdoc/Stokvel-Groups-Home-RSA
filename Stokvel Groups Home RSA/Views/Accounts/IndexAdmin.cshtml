@@ -1,0 +1,108 @@
+﻿@using Stokvel_Groups_Home_RSA.Models.GroupedTables
+@model ApplicationAccount
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Account Types </h2>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="bg-white rounded-3 p-3 mb-4">
+
+    <a class="btn btn-outline-danger" asp-action="Create">Create New</a>
+
+</nav>
+
+<alerts></alerts>
+
+<div class="row">
+
+
+    @foreach (var item in Model.Account)
+    {
+        <div class="col-md-6">
+            <div class="card mb-5" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <h3 class="mb-3">@Html.DisplayFor(modelItem => item.Group.TypeAccount)  Account</h3>
+                    <p class="small mb-0">
+                        <i class="fa fa-users text-primary fa-lg"></i> <span class="mx-2">|</span> You Have
+                        <strong>An Account Here</strong>
+                    </p>
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-start align-items-center">
+
+                        <p class="mb-0 text-uppercase">
+                            @using (Html.BeginForm("AdminToAcccount", "Accounts", FormMethod.Get))
+                            {
+                                @Html.Hidden("AccountType", (object)item.Group.TypeAccount)
+                                <button type="submit" class="btn btn-outline-primary "><i class="fa fa-external-link ms-4 me-2 text-black"></i>  Group link</button>
+                            }
+                        </p>
+
+                        <a type="button" asp-action="Create" class="btn btn-outline-light btn-sm btn-floating">
+                            <i class="bi bi-plus-circle orange_color  fa-3x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <!-- tab style 2 -->
+    <div class="col-md-12">
+        <div class="white_shd full margin_bottom_30">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2>Account Info</h2>
+                </div>
+            </div>
+            <div class="full inner_elements">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="tab_style2">
+                            <div class="tabbar padding_infor_info">
+                                <nav>
+                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home_s2" role="tab" aria-controls="nav-home_s2" aria-selected="true">Home</a>
+                                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile_s2" role="tab" aria-controls="nav-profile_s2" aria-selected="false">Join Info</a>
+                                    </div>
+                                </nav>
+                                <div class="tab-content" id="nav-tabContent">
+                                    <div class="tab-pane fade show active" id="nav-home_s2" role="tabpanel" aria-labelledby="nav-home-tab">
+                                        <p>
+                                            This is the account type page. Welcome. Please take the time to read all that is on this page.
+                                            It is important that you understand how to get started and what to expect.
+                                            Everything will be explained in depth so that you can understand exactly what you need to do.
+                                            We're with you every step of the way.
+                                        </p>
+                                    </div>
+                                    <div class="tab-pane fade" id="nav-profile_s2" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                        <p>
+                                            Members can join up to two groups at once, either of the same or separate account types.
+                                            Please keep in mind that members should only join groups they are familiar with and have agreed to as a group.
+                                            <br />
+                                            On this page, you can add a new group or click the blue button (Group Link) to continue to next page.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

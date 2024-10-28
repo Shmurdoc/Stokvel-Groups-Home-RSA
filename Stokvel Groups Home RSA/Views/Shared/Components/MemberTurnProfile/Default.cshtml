@@ -1,0 +1,168 @@
+﻿@using Stokvel_Groups_Home_RSA.Models.GroupedTables
+@model AccountInvoice
+
+
+
+<!-- row -->
+<div class="row column1">
+    <div class="col-md-12">
+        <div class="white_shd full margin_bottom_30">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2>Member Turn</h2>
+                </div>
+            </div>
+
+            <div class="full price_table padding_infor_info">
+                <div class="row">
+                    <div class="row d-flex justify-content-left align-items-center h-100">
+
+
+
+
+                        <!-- Begin .page-heading -->
+                        <div class="page-heading">
+                            <div class="media clearfix">
+                                <div class="media-left pr30">
+                                    <a href="#">
+                                        @if (@ViewBag.image != @ViewBag.MemberPhotoPath)
+                                        {
+                                            <img class="media-object mw150" src="@Url.Content("~/images/MemberProfile/" + ViewBag.MemberFileName)"/>
+                                        }
+                                        else
+                                        {
+                                            <img class="media-object mw150" src="@Url.Content("~/images/Profile/" + ViewBag.MemberFileName)"/>
+                                        }
+                                    </a>
+                                </div>
+                                <div class="media-body va-m">
+                                    <h2 class="media-heading">
+                                        @ViewBag.MemberNames
+                                        <small> - Profile</small>
+                                    </h2>
+                                    <p class="lead">This month is dedicated to a Stokvel home group member, @ViewBag.MemberNames. Please remember to deposit before the 25th of this month to avoid penalty fees. Happy Stokvel! </p>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="panel">
+                                                <div class="panel-heading">
+                                                    <span class="panel-icon">
+                                                        <i class="fa fa-star"></i>
+                                                    </span>
+                                                    <span class="panel-title"> Member Number: </span>
+                                                </div>
+                                                <div class="panel-body pn">
+                                                    <table class="table mbn tc-icon-1 tc-med-2 tc-bold-last">
+                                                        <thead>
+                                                            <tr class="hidden">
+                                                                <th class="mw30">#</th>
+                                                                <th>First Name</th>
+                                                                <th>Revenue</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="fa fa-arrow-up text-success"></span>
+                                                                </td>
+                                                                <td>Deposited Amount</td>
+                                                                <td>
+                                                                    <i class="fa fa-caret-up text-info pr10"></i>R @ViewBag.DepositedAmount.ToString("0.00")
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="fa fa-arrow-down  text-danger"></span>
+                                                                </td>
+                                                                <td>Outstanding Amount</td>
+                                                                <td>
+                                                                    <i class="fa fa-caret-down text-danger pr10"></i>R @ViewBag.OutstandingAmount.ToString("0.00")
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="fa fa-balance-scale text-info"></span>
+                                                                </td>
+                                                                <td>Target Amount</td>
+                                                                <td>
+                                                                    <i class="fa fa-caret-up text-info pr10"></i>R @ViewBag.GroupTargetAmount.ToString("0.00")
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+						<!-- partial:index.partial.html -->
+                        <sectionn class="cd-horizontal-timeline position-sticky border-1 mt-5 dash_head">
+							<div class="timeline">
+								<div class="events-wrapper">
+									<div class="events">
+                                         
+										<ol>
+                                            @for (int i=0; i < @ViewBag.MemberDateList.Count; i++)
+                                            {
+                                                @if (i == 0)
+                                                {
+                                                    <li><a href="#0" data-date="@ViewBag.MemberDateList[i].ToString("dd/MM/yyyy")" class="selected"> @ViewBag.MemberDateList[i].ToString("MMM")</a></li>
+                                                }else{
+                                                    <li><a href="#0" data-date="@ViewBag.MemberDateList[i].ToString("dd/MM/yyyy")">@ViewBag.MemberDateList[i].ToString("MMM")</a></li>
+                                                }
+                                            }
+										</ol>
+										<span class="filling-line" aria-hidden="true"></span>
+									</div> <!-- .events -->
+								</div> <!-- .events-wrapper -->
+                               
+                                        <ul class="cd-timeline-navigation">
+                                            <li><a href="#0" class="prev inactive">Prev</a></li>
+                                            <li><a href="#0" class="next">Next</a></li>
+                                        </ul> <!-- .cd-timeline-navigation -->
+                  
+                            </div> <!-- .timeline -->
+
+							<div class="events-content">
+								<ol>
+                                     @*  @for (int i = 0; i < @ViewBag.MemberDateList.Count; i++)
+                                 {
+                                         <li class="selected" data-date="@ViewBag.MemberDateList[i].ToString("dd/MM/yyyy")">
+									 	<h3>Members Deposited On This Day</h3>
+                                             <em>@ViewBag.MemberDateList[i].ToString("dd/MM/yyyy")</em>
+                                             @foreach (var memberList in Model.Where(x => x.Deposit.DepositDate == @ViewBag.MemberDateList[i]))
+                                             {
+									 	<p>
+									 		@memberList.AccountUser.FirstName
+                                             @memberList.AccountUser.LastName
+									 	</p>
+                                 }
+									 </li>
+                                        
+                                     } *@
+								</ol>
+							</div> <!-- .events-content -->
+						</sectionn>
+
+
+
+
+						
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+									

@@ -1,0 +1,135 @@
+﻿@using Stokvel_Groups_Home_RSA.Models.GroupedTables
+@model ApplicationAccount
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Account Types <small>( The Account Types You Created )</small></h2>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="bg-white rounded-3 p-3 mb-4">
+
+    <a class="btn btn-outline-danger" asp-action="Create">Create New</a>
+
+</nav>
+
+
+
+
+
+<div class="row">
+
+    @foreach (var item in Model.Account)
+    {
+        <div class=" col-md-6">
+            <div class="card mb-5" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <h3 class="mb-3">@Html.DisplayFor(modelItem => item.Group.GroupName)</h3>
+
+                    @if (item.Group.Active == true)
+                    {
+                        <p class="small mb-0">
+                            <i class="fa fa-star fa-lg"></i> <span class="mx-2">|</span>
+                            Your Group Is <strong> Active </strong>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="small mb-0">
+                            <i class="fa fa-dot-circle-o fa-lg"></i> <span class="mx-2">|</span>
+                            Your Group Is<strong> Not Active </strong>
+                        </p>
+                    }
+
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-start align-items-center">
+
+                        <p class="mb-0 text-uppercase">
+                            @using (Html.BeginForm("AdminMembersDashboard", "Accounts", FormMethod.Get))
+                            {
+                                @Html.Hidden("groupId", (object)item.GroupId)
+                                @Html.Hidden("AccountType", (object)item.Group.TypeAccount)
+                                @Html.Hidden("groupName", (object)item.Group.GroupName)
+                                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-external-link ms-4 me-2 text-black"></i>  Group link</button>
+                            }
+                        </p>
+
+                        @foreach (var items in Model.ApplicationUsers.Take(4))
+                        {
+                            @if (Url.Content(items.MemberPhotoPath) != "/wwwroot/images/Profile")
+                            {
+                                <img src="@Url.Content("~/images/MemberProfile/" + @items.MemberFileName)" height="50px" width="50px" alt="avatar"
+                                     class="img-fluid rounded-circle me-3" width="35" />
+                            }
+                            else
+                            {
+                                <img src="@Url.Content("~/images/Profile/" + @items.MemberFileName)" height="50px" width="50px" alt="avatar"
+                                     class="img-fluid rounded-circle me-3" />
+                            }
+
+                        }
+
+                        <a type="button" class="btn btn-outline-light btn-sm btn-floating">
+                            <i class="bi bi-plus-circle orange_color  fa-3x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- tab style 2 -->
+    <div class="col-md-12">
+        <div class="white_shd full margin_bottom_30">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2>Account Info</h2>
+                </div>
+            </div>
+            <div class="full inner_elements">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="tab_style2">
+                            <div class="tabbar padding_infor_info">
+                                <nav>
+                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home_s2" role="tab" aria-controls="nav-home_s2" aria-selected="true">Group Info</a>
+                                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile_s2" role="tab" aria-controls="nav-profile_s2" aria-selected="false">Account Info</a>
+                                    </div>
+                                </nav>
+                                <div class="tab-content" id="nav-tabContent">
+                                    <div class="tab-pane fade show active" id="nav-home_s2" role="tabpanel" aria-labelledby="nav-home-tab">
+                                        <p>
+                                            Active accounts will display a gold star with the words "Your group is active."
+                                            Remember that you can only leave a group before it is activated.
+                                            If you don't leave before it starts. Please speak with the administrator.
+                                        </p>
+                                    </div>
+                                    <div class="tab-pane fade" id="nav-profile_s2" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                        <p>
+                                            You can leave the group at any moment before it becomes active.
+                                            Remember that the group manager has the authority to remove anyone from the group before it becomes active.
+                                            All this is Possible in the next page.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
