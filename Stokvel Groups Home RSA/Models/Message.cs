@@ -26,4 +26,7 @@ public class Message
     {
         When = DateTime.Now;
     }
+
+
+    
 }

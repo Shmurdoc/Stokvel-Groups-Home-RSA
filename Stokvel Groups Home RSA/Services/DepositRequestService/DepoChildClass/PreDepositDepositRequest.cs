@@ -20,15 +20,15 @@ namespace Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass
             _unitOfWork = unitOfWork;
         }
 
-        public async Task DepositAsync(Deposit? deposit, string? description, int accountId, string? userId)
+        public async Task DepositAsync(Deposit? deposit, string? description, int accountId, string? userId, string? dropdownValue)
         {
             if (deposit == null)
             {
                 throw new ArgumentNullException(nameof(deposit));
             }
 
-            await _depositSet.DepositToAccountAsync(deposit, description, accountId, userId);
-            await _preDepositRequestServices.UpdatePreDeposit(deposit, accountId);
+            await _depositSet.DepositToAccountAsync(deposit, description, accountId, userId, dropdownValue);
+            await _preDepositRequestServices.UpdatePreDepositAsync(deposit, accountId);
         }
     }
 

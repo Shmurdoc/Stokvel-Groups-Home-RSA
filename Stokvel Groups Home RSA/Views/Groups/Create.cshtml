@@ -5,94 +5,179 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-        <div class="row column_title">
-            <div class="col-md-12">
-                <div class="page_title">
-                    <h2>Create Group</h2>
-                </div>
-            </div>
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Create Group</h2>
         </div>
+    </div>
+</div>
 
-        <nav aria-label="breadcrumb" class="bg-white rounded-3 p-3 mb-4">
-
-
-
+<nav aria-label="breadcrumb" class="bg-white rounded-3 p-3 mb-4">
     <a class="btn btn-outline-danger" asp-action="Index">Back to List</a>
-            
-
-
-    <!--alert bar auto time dismiss-->
+    <!-- alert bar auto time dismiss -->
     <alerts></alerts>
+</nav>
 
-        </nav>
+<!-- Group Info Section -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg mb-4" style="border-radius: 15px;">
+            <div class="card-header text-white text-center" style="background-color: #ff5722; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                <h4 class="m-0">Group Info</h4>
+            </div>
+            <div class="card-body p-4" style="border-radius: 15px;">
+                <form asp-action="Create">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-
-        <!-- row -->
-        <div class="row column1">
-            <div class="col-md-12">
-                <div class="white_shd full margin_bottom_30">
-                    <div class="full graph_head">
-                        <div class="heading1 margin_0">
-                    <h2>Create Group</h2>
-                        </div>
+                    <!-- Group Name -->
+                    <div class="form-group mb-3">
+                        <label asp-for="GroupName" class="control-label font-weight-bold">Group Name</label>
+                        <input asp-for="GroupName" class="form-control" placeholder="Enter a unique group name" />
+                        <span asp-validation-for="GroupName" class="text-danger"></span>
                     </div>
-                    <div class="full price_table padding_infor_info">
 
-                        <div class="row">
-                            <div class="row d-flex justify-content-left align-items-center h-100">
-                                <div class="row">
-                                <div class="col-md-4">
-                                    <form asp-action="Create">
-                                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-                                        <div class="form-group">
-                                            <label asp-for="GroupName" class="control-label"></label>
-                                            <input asp-for="GroupName" class="form-control" />
-                                            <span asp-validation-for="GroupName" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="VerifyKey" class="control-label"></label>
-                                            <input asp-for="VerifyKey" class="form-control" />
-                                            <span asp-validation-for="VerifyKey" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="TypeAccount" class="control-label"></label>
-                                            <select asp-for="TypeAccount" class="form-control" asp-items="@Html.GetEnumSelectList(typeof(AccountType))"></select>
-                                            <span asp-validation-for="TypeAccount" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="TotalGroupMembers" class="control-label"></label>
-                                            <input asp-for="TotalGroupMembers" class="form-control" />
-                                            <span asp-validation-for="TotalGroupMembers" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="AccountTarget" class="control-label"></label>
-                                            <input asp-for="AccountTarget" class="form-control" />
-                                            <span asp-validation-for="AccountTarget" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="submit" value="Create" class="btn btn-primary" />
-                                        </div>
-                                    </form>
+                    <!-- Verify Key -->
+                    <div class="form-group mb-3">
+                        <label asp-for="VerifyKey" class="control-label font-weight-bold">Verify Key</label>
+                        <input asp-for="VerifyKey" class="form-control" placeholder="Enter a unique verify key" />
+                        <span asp-validation-for="VerifyKey" class="text-danger"></span>
+                    </div>
+
+                    <!-- Type of Account -->
+                    <div class="form-group mb-3">
+                        <label asp-for="TypeAccount" class="control-label font-weight-bold">Type of Account</label>
+                        <select asp-for="TypeAccount" class="form-control" asp-items="@Html.GetEnumSelectList(typeof(AccountType))">
+                            <option value="">Select an Account Type</option> <!-- Optional placeholder for select -->
+                        </select>
+                        <span asp-validation-for="TypeAccount" class="text-danger"></span>
+
+                        <!-- Learn More Link -->
+                        <a href="#" data-toggle="modal" data-target="#accountTypeModal">Learn More about Account Types</a>
+                    </div>
+
+
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="accountTypeModal" tabindex="-1" role="dialog" aria-labelledby="accountTypeModalLabel" aria-hidden="true">
+                        <div class="modal-dialog rounded-4" role="document">
+                            <!-- Added rounded-3 here -->
+                            <div class="modal-content rounded-4">
+                                <!-- Added rounded-3 here -->
+                                <div class="modal-header text-white" style="background-color: #ff5722;">
+                                    <h5 class="modal-title" id="accountTypeModalLabel">Account Type Differences</h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>Low Savings Club:</h6>
+                                    <p>Has limited from R2000 to R6999 </p>
+
+                                    <h6>Low Savings Club::</h6>
+                                    <p>Has limited from R7000 to R13999.</p>
+
+                                    <h6>Low Savings Club::</h6>
+                                    <p>Has limited from R14 to R200000.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 </div>
                             </div>
-
-                            <div>
-                                <a asp-action="Index">Back to List</a>
-                            </div>
-
-                            </div>
                         </div>
                     </div>
-                </div>
+
+
+
+
+
+                    <!-- Total Group Members -->
+                    <div class="form-group mb-3">
+                        <label asp-for="TotalGroupMembers" class="control-label font-weight-bold">Total Group Members</label>
+                        <input asp-for="TotalGroupMembers" class="form-control" placeholder="Enter the total number of members" />
+                        <span asp-validation-for="TotalGroupMembers" class="text-danger"></span>
+                    </div>
+
+                    <!-- Account Target -->
+                    <div class="form-group mb-3">
+                        <label asp-for="AccountTarget" class="control-label font-weight-bold">Account Target</label>
+                        <input asp-for="AccountTarget" class="form-control" placeholder="Enter the target amount for the account" />
+                        <span asp-validation-for="AccountTarget" class="text-danger"></span>
+                    </div>
+                </form>
+
             </div>
-            <!-- end row -->
         </div>
+    </div>
+</div>
 
+<!-- Withdrawal Method Section -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg" style="border-radius: 15px;">
+            <div class="card-header text-white text-center" style="background-color: #ff5722; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                <h4 class="m-0">Withdrawal Method</h4>
+            </div>
+            <div class="card-body p-4" style="border-radius: 15px;">
+                <form asp-action="Create" method="post" id="createGroupForm">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
+                    <!-- Payment Method -->
+                    <div class="form-group mb-3">
+                        <label for="paymentMethod" class="control-label font-weight-bold">Payment Method</label>
+                        <select id="paymentMethod" name="paymentMethod" class="form-control" required>
+                            <option value="" disabled selected>Select Payment Method</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Paypal">Paypal</option>
+                            <option value="Mobile Payment">Mobile Payment</option>
+                        </select>
+                    </div>
+
+                    <!-- Account Number -->
+                    <div class="form-group mb-3">
+                        <label for="accoutNumber" class="control-label font-weight-bold">Transaction Reference / Account Number</label>
+                        <input id="accoutNumber" name="accoutNumber" class="form-control" placeholder="Enter the transaction reference number" />
+                    </div>
+
+                    <!-- Confirm Account Number -->
+                    <div class="form-group mb-3">
+                        <label for="confirmAccountNumber" class="control-label font-weight-bold">Confirm Transaction Reference / Account Number</label>
+                        <input id="confirmAccountNumber" name="confirmAccountNumber" class="form-control" placeholder="Re-enter the transaction reference number" />
+                        <span id="confirmError" class="text-danger" style="display:none;">Account numbers do not match!</span>
+                    </div>
+
+                    <!-- Reminder about Card for Withdrawal and Deposit -->
+                    <div class="form-group mb-3">
+                        <p class="text-warning font-weight-bold bg-dark  p-2 rounded-3">
+                            <strong>Important Reminder:</strong> The card you use for withdrawals must be the same as the one you use for deposits. You are not allowed to withdraw funds using a different card to avoid money laundering or fraudulent activity.
+                        </p>
+                    </div>
+
+                    <!-- Confirmation Checkbox -->
+                    <div class="form-group mb-3">
+                        <label>
+                            <input type="checkbox" id="confirmReminder" /> I have read and understood the above reminder.
+                        </label>
+                        <span id="checkboxError" class="text-danger" style="display:none;">You must confirm that you have read and understood the reminder to proceed.</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-success btn-lg" disabled id="submitBtn">
+                            Create Group
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

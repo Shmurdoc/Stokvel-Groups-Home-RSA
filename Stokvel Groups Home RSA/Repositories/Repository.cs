@@ -8,19 +8,20 @@ namespace Stokvel_Groups_Home_RSA.Repositories
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
+        private readonly DbSet<T> _dbSet;
         internal DbSet<T> dbSet;
 
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            this.dbSet = _db.Set<T>();
+            _dbSet = _db.Set<T>();
 
         }
 
 
         public async Task Add(T entity)
         {
-            await dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity);
         }
 
         public async Task<T?> Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
@@ -29,11 +30,11 @@ namespace Stokvel_Groups_Home_RSA.Repositories
             IQueryable<T> query;
             if (tracked)
             {
-                query = dbSet;
+                query = _dbSet;
             }
             else
             {
-                query = dbSet.AsNoTracking();
+                query = _dbSet.AsNoTracking();
             }
 
             query = query.Where(filter);
@@ -48,11 +49,10 @@ namespace Stokvel_Groups_Home_RSA.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T?>> GetAllAsync(
-     Expression<Func<T, bool>>? filter = null,
+        public async Task<IEnumerable<T?>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
      string? includeProperties = null)
         {
-            IQueryable<T> query = dbSet;
+            IQueryable<T> query = _dbSet;
 
             if (filter != null)
             {
@@ -71,6 +71,9 @@ namespace Stokvel_Groups_Home_RSA.Repositories
             return await query.ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> GetByTypeAsync<TType>() where TType : class, T { 
+            return await _dbSet.OfType<TType>().ToListAsync(); 
+        }
 
         public async Task<T?> GetByIdAsync(string? id)
         {

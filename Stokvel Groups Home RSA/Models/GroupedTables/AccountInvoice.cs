@@ -5,6 +5,6 @@
         public List<Deposit?>? Deposit { get; set; }
         public List<Invoice?>? Invoice { get; set; }
         public List<Account?>? Account { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public List<ApplicationUser?>? ApplicationUser { get; set; }
     }
 }

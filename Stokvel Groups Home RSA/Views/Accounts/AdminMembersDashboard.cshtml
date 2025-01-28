@@ -37,12 +37,10 @@
 
 
 
-@if (ViewBag.StokvelActive = true)
+@if (ViewBag.StokvelActive != false)
 {
-    @* @await Component.InvokeAsync("MemberTurnProfile") *@
+    @await Component.InvokeAsync("MemberTurnProfile")
 }
-
-
 
 <alerts></alerts>
 
@@ -124,7 +122,7 @@
                                                 {
                                                     @if (@member.PreDeposit != null)
                                                     {
-                                                        @if (@member.PreDeposit.Amount == member.Group.AccountTarget / (member.Group.TotalGroupMembers - 1))
+                                                        @if (@member.PreDeposit.Amount == member.Group.AccountTarget / (member.Group.TotalGroupMembers - 1) && member.Group.Active == false)
                                                         {
                                                             <a class="btn btn-success btn-rounded btn-lg text-white">Ready</a>
                                                             <br />
@@ -189,7 +187,7 @@
                                                     }
 
                                                 }
-                                                @if (@member.AccountQueueStart.Month == DateTime.Now.Month)
+                                                @if (@member.AccountQueueStart.Month == DateTime.Now.Month && member.Group.Active == true)
                                                 {
                                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                                     {

@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stokvel_Groups_Home_RSA.Interface.IRepo;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IGroupServices;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IPreDepositRequestService;
 using Stokvel_Groups_Home_RSA.Models;
 using Stokvel_Groups_Home_RSA.Models.GroupedTables;
+using Stokvel_Groups_Home_RSA.Services.GroupServices;
 
 namespace Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositInfo
 {
@@ -10,11 +12,14 @@ namespace Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositIn
     {
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGroupRequestServices _groupRequestServices;
         public DepositToAccount? DepositToAccount { get; set; }
         public AccountPreDeposit? AccountPreDeposit { get; set; }
-        public PreDepositInfo(IUnitOfWork unitOfWork)
+        
+        public PreDepositInfo(IUnitOfWork unitOfWork, IGroupRequestServices groupRequestServices)
         {
             _unitOfWork = unitOfWork;
+            _groupRequestServices = groupRequestServices;
         }
 
 
@@ -73,18 +78,29 @@ namespace Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositIn
 
 
 
-        public async Task UpdatePreDeposit(Deposit? deposit, int accountId)
+        public async Task UpdatePreDepositAsync(Deposit? deposit, int accountId)
         {
-            var memberPreDepoAccountList = await _unitOfWork.PreDepositRepository?.GetAllAsync();
+            if (deposit == null)
+            {
+                throw new ArgumentNullException(nameof(deposit));
+            }
+
+            var memberPreDepoAccountList = await PreDepoMembersAsync(accountId);
+            decimal updateDepositAmount = deposit.DepositAmount;
+
+            if (memberPreDepoAccountList?.PreDeposit != null)
+            {
+                updateDepositAmount += memberPreDepoAccountList.PreDeposit.Amount;
+            }
 
             var preDeposit = new PreDeposit
             {
                 AccountId = accountId,
                 PreDepositDate = DateTime.Now,
-                Amount = deposit.DepositAmount
+                Amount = updateDepositAmount
             };
 
-            if (!memberPreDepoAccountList.Any(x => x.AccountId == accountId))
+            if (memberPreDepoAccountList == null)
             {
                 await _unitOfWork.PreDepositRepository.Add(preDeposit);
             }
@@ -92,8 +108,13 @@ namespace Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositIn
             {
                 _unitOfWork.PreDepositRepository.Update(preDeposit);
             }
+
             await _unitOfWork.SaveChangesAsync();
         }
+
+
+
+
 
     }
 }

@@ -26,11 +26,10 @@
             <div class="col-md-6">
                 @if ( User.IsInRole("Member"))
                 {
-                    <a class="btn btn-outline-danger" asp-controller="Accounts" asp-action="Create">Create New</a>
+                    <a class="btn btn-outline-danger" asp-controller="Accounts" asp-action="Create">Join Group</a>
                 }
                 else{
                    <a class="btn btn-outline-danger" asp-action="Create">Create New</a>
-                    
                     }
 
             </div>
@@ -73,10 +72,8 @@
                                     <div class="contact_inner">
                                         <div class="left">
                                             <h3> @Html.DisplayFor(modelItem => item.GroupName)</h3>
-                                            <p><strong>Verify Key: </strong>@Html.DisplayFor(modelItem => item.VerifyKey)</p>
                                             <p><strong>Play For: </strong> R @Html.DisplayFor(modelItem => item.AccountTarget)</p>
                                             <ul class="list-unstyled">
-                                                <li><i class="fa fa-envelope-o"></i> : test@gmail.com</li>
                                                 <p><strong>Total Member In Take: </strong> @Html.DisplayFor(modelItem => item.TotalGroupMembers)</p>
                                             </ul>
                                         </div>

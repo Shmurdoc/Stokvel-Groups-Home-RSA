@@ -1,18 +1,13 @@
-﻿using Stokvel_Groups_Home_RSA.Models;
+﻿using Stokvel_Groups_Home_RSA.Interface.Infrastructure;
+using Stokvel_Groups_Home_RSA.Models;
+using Stokvel_Groups_Home_RSA.Repositories;
 
 namespace Stokvel_Groups_Home_RSA.Interface.IRepo.Finance
 {
-    public interface IWithdrawRepository
-    {
-        Task<List<WithdrawDetails>>? GetAll();
+	public interface IWithdrawRepository : IRepository<WithdrawDetails>
+	{
 
-        Task<WithdrawDetails>? Details(int? id);
-        Task Insert(WithdrawDetails? invoiceDetails);
+		void Update(WithdrawDetails? withdrawDetails);
 
-        Task Edit(WithdrawDetails? invoiceDetails);
-
-        Task Delete(int? id);
-
-        bool InvoiceDetailsExists(int? id);
-    }
+	}
 }

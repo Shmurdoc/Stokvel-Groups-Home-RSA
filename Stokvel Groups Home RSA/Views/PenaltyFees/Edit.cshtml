@@ -1,0 +1,46 @@
+﻿@model Stokvel_Groups_Home_RSA.Models.PenaltyFee
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>PenaltyFee</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PenaltyFeeId" />
+            <div class="form-group">
+                <label asp-for="InvoiceId" class="control-label"></label>
+                <select asp-for="InvoiceId" class="form-control" asp-items="ViewBag.InvoiceId"></select>
+                <span asp-validation-for="InvoiceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PenaltyDate" class="control-label"></label>
+                <input asp-for="PenaltyDate" class="form-control" />
+                <span asp-validation-for="PenaltyDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PenaltyAmount" class="control-label"></label>
+                <input asp-for="PenaltyAmount" class="form-control" />
+                <span asp-validation-for="PenaltyAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PenaltyLevel" class="control-label"></label>
+                <input asp-for="PenaltyLevel" class="form-control" />
+                <span asp-validation-for="PenaltyLevel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

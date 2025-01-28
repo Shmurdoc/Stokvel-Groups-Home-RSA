@@ -8,8 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\group-withdrawal-validation.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\group-withdrawal-validation.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Models\GroupedTables\ApplicationUserPersonal\" />
     <Folder Include="Services\GroupRequestService\GroupChildClass\" />
+    <Folder Include="Services\PenaltyFeeRequsetService\" />
     <Folder Include="wwwroot\images\loader\" />
   </ItemGroup>
 
@@ -84,6 +93,7 @@
     <None Include="wwwroot\js\custom.js" />
     <None Include="wwwroot\js\custom_chart.js" />
     <None Include="wwwroot\js\drop-zone.js" />
+    <None Include="wwwroot\js\group-withdrawal-validation.js" />
     <None Include="wwwroot\js\imagery.js" />
     <None Include="wwwroot\js\index1.js" />
     <None Include="wwwroot\js\jquery-3.3.1.min.js" />
@@ -404,22 +414,22 @@
   <ItemGroup>
     <PackageReference Include="jQuery" Version="3.7.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.33" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.33" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.36" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.36" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.33" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.33" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.33">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.36" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.36">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.33" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.33" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.33">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.35" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.35" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.36">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Ajax" Version="3.2.6" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.17" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.18" />
     <PackageReference Include="PagedList" Version="1.17.0" />
     <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
     <PackageReference Include="X.PagedList" Version="9.0.0-prerelease" />

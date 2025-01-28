@@ -11,9 +11,6 @@ public class AccountsRepository : Repository<Account>, IAccountsRepository
     public AccountsRepository(ApplicationDbContext context) : base(context)
     {
         _context = context;
-
-
-
     }
     public void Update(Account account)
     {

@@ -7,6 +7,7 @@ namespace Stokvel_Groups_Home_RSA.Interface.Infrastructure
 
         // T - Category
         Task<IEnumerable<T?>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
+        Task<IEnumerable<T>> GetByTypeAsync<TType>() where TType : class, T;
         Task<T?> Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false);
         IQueryable<T?> GetList();
         Task<T?> GetByIdAsync(string? id);

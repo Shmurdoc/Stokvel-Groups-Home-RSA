@@ -10,9 +10,10 @@ public class WithdrawDetails
     public int DetailedId { get; set; }
     public int InvoiceId { get; set; }
     public Invoice? Invoice { get; set; }
-    public int PenaltyFeeId { get; set; }
-    public PenaltyFee? PenaltyFee { get; set; }
-    public decimal CreditAmount { get; set; } = default;
+    public string? AccoutNumber { get; set; }
+    public string? PaymentMethod { get; set; }
+    public string? TransactionReference { get; set; }
+    public decimal CreditAmount { get; set; }
     public int TaxID { get; set; }
 
     [DataType(DataType.Date)]

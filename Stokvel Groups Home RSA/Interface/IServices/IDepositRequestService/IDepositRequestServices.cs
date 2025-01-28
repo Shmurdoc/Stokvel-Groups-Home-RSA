@@ -6,7 +6,7 @@ namespace Stokvel_Groups_Home_RSA.Interface.IServices.IDepositRequestService
     {
         //DepositToAccount? PreDepoMembers(int accountId);
         //decimal PreDepoTarget(int groupId);
-        Task DepositAsync(Deposit deposit, string description, int accountId, string? userId);
+        Task DepositAsync(Deposit deposit, string description, int accountId, string? userId, string? dropdownValue);
 
     }
 

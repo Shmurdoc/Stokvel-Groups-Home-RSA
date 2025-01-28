@@ -1,18 +1,11 @@
-﻿using Stokvel_Groups_Home_RSA.Models;
+﻿using Stokvel_Groups_Home_RSA.Interface.Infrastructure;
+using Stokvel_Groups_Home_RSA.Models;
 
 namespace Stokvel_Groups_Home_RSA.Interface.IRepo.Finance
 {
-    public interface IPenaltyFeeRepository
+    public interface IPenaltyFeeRepository: IRepository<PenaltyFee>
     {
-        Task<List<PenaltyFee>>? GetAll();
+        void Update(PenaltyFee? penaltyFee);
 
-        Task<PenaltyFee> Details(int? id);
-        Task Insert(PenaltyFee? penaltyFee);
-
-        Task Edit(PenaltyFee? penaltyFee);
-
-        Task Delete(int? id);
-
-        bool PenaltyFeeExists(int? id);
     }
 }

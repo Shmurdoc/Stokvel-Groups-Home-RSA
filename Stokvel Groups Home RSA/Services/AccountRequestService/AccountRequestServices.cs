@@ -29,49 +29,81 @@ public class AccountRequestServices : IAccountRequestServices
             return null;
         }
 
-        var accountList = await _unitOfWork.AccountsRepository.GetAllAsync(
-            x => x.Id == userId,
-            includeProperties: "Group"
+        // Fetch all groups with their associated accounts
+        var groups = await _unitOfWork.GroupsRepository.GetAllAsync(
+            includeProperties: "Accounts"
         );
 
+        // Filter the groups where the specified user is a member
+        var groupIdsWithUser = groups
+            .Where(group => group.Accounts.Any(account => account.Id == userId))
+            .Select(group => group.GroupId)
+            .ToList();
+
+        // Initialize a list to hold all members from the matching groups
+        var memberAccounts = new List<Account>();
+
+        // Retrieve and accumulate members for each group that contains the user
+        foreach (var groupId in groupIdsWithUser)
+        {
+            var groupMembers = await _unitOfWork.AccountsRepository.GetAllAsync(
+                account => account.GroupId == groupId
+            );
+            memberAccounts.AddRange(groupMembers);
+        }
+
+        // Create the application account object with associated users and account members
         var applicationAccount = new ApplicationAccount
         {
-            ApplicationUsers = new List<ApplicationUser>(),
-            Account = accountList.ToList()
+            ApplicationUsers = new List<ApplicationUser>(), // Populate as needed
+            Account = memberAccounts
         };
 
         return applicationAccount;
     }
 
 
-    private ApplicationAccount GetGroupMembers(List<int>? groupId)
+    // must move this to group request 
+    private ApplicationAccount GetGroupMembers(List<int>? groupIds)
     {
-        List<Account> account = new();
-        List<ApplicationUser> applicationUsers = new();
-
-        foreach (var id in groupId)
+        if (groupIds == null || !groupIds.Any())
         {
-            var j = _unitOfWork.GroupsRepository.GetList().Where(x => x.GroupId == id);
-            var group = j
-                .Include(a => a.Accounts)
-                .ThenInclude(au => au.ApplicationUser)
+            return new ApplicationAccount
+            {
+                Account = new List<Account>(),
+                ApplicationUsers = new List<ApplicationUser>()
+            };
+        }
+
+        var accounts = new List<Account>();
+        var applicationUsers = new List<ApplicationUser>();
+
+        // Fetch group data and associated accounts and users
+        foreach (var groupId in groupIds)
+        {
+            var group = _unitOfWork.GroupsRepository
+                .GetList()
+                .Where(g => g.GroupId == groupId)
+                .Include(g => g.Accounts)
+                    .ThenInclude(a => a.ApplicationUser)
                 .ToList();
 
-            account.AddRange(group.Where(x => x.GroupId == id).SelectMany(x => x.Accounts?.ToList()).ToList());
-            applicationUsers.AddRange(group.Where(x => x.GroupId == id).SelectMany(x => x.Accounts?.Select(x => x.ApplicationUser)).ToList());
-
-            ApplicationAccount = new()
-            {
-                Account = account.ToList(),
-                ApplicationUsers = applicationUsers.Distinct().ToList(),
-            };
-
-            ApplicationAccount.ApplicationUsers.DistinctBy(x => x.Id).ToList();
-
-
+            // Collect accounts and associated users
+            accounts.AddRange(group.SelectMany(g => g.Accounts ?? new List<Account>()));
+            applicationUsers.AddRange(group.SelectMany(g => g.Accounts?.Select(a => a.ApplicationUser) ?? new List<ApplicationUser>()));
         }
-        return ApplicationAccount;
+
+        // Remove duplicate application users based on their Id
+        var distinctApplicationUsers = applicationUsers.DistinctBy(u => u.Id).ToList();
+
+        // Create and return the ApplicationAccount object
+        return new ApplicationAccount
+        {
+            Account = accounts.Distinct().ToList(),
+            ApplicationUsers = distinctApplicationUsers
+        };
     }
+
 
 
     public async Task<ApplicationAccount?> InAccountListAsync(string? userId, AccountType? accountType)
@@ -159,11 +191,11 @@ public class AccountRequestServices : IAccountRequestServices
 
     public async Task AddAccountToGroupAsync(Account account, string? userId)
     {
-        if (userId == null) return;
+        if (string.IsNullOrEmpty(userId)) return;
 
         var accountProfiles = await _unitOfWork.AccountProfileRepository.GetAllAsync();
         var groups = await _unitOfWork.GroupsRepository.GetAllAsync();
-        var memberGroup = groups.FirstOrDefault(x => x.VerifyKey == account.GroupVerifyKey).GroupId;
+        var memberGroup = groups.FirstOrDefault(x => x.VerifyKey == account.GroupVerifyKey)?.GroupId;
 
         if (memberGroup == null)
         {
@@ -172,10 +204,9 @@ public class AccountRequestServices : IAccountRequestServices
 
         account.Id = userId;
         account.AccountCreated = DateTime.Now;
-        account.GroupId = memberGroup;
+        account.GroupId = memberGroup.Value;
 
-        if (!accountProfiles.Any(x => x.Id == userId))
-        {
+       
             var accountProfile = new AccountProfile
             {
                 Id = userId,
@@ -190,10 +221,12 @@ public class AccountRequestServices : IAccountRequestServices
             };
 
             await _unitOfWork.AccountProfileRepository.Add(accountProfile);
-            await _unitOfWork.AccountsRepository.Add(account);
-            await _unitOfWork.SaveChangesAsync();
-        }
+        
+
+        await _unitOfWork.AccountsRepository.Add(account);
+        await _unitOfWork.SaveChangesAsync();
     }
+
 
 
     public bool CheckIfAccountExists(string userId, string verifyKey)

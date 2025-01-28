@@ -7,6 +7,6 @@ namespace Stokvel_Groups_Home_RSA.Interface.IServices.IPreDepositRequestService
     {
         Task<DepositToAccount?> PreDepoMembersAsync(int accountId);
         Task<AccountPreDeposit?> CheckPreDepositStatusDepositAsync(int accountId);
-        Task UpdatePreDeposit(Deposit deposit, int accountId);
+        Task UpdatePreDepositAsync(Deposit deposit, int accountId);
     }
 }

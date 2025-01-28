@@ -9,11 +9,9 @@ namespace Stokvel_Groups_Home_RSA.Services.GroupServices
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGroupServices _groupServices;
 
-        public GroupRequestServices(IGroupServices groupServices, IUnitOfWork unitOfWork)
+        public GroupRequestServices(IUnitOfWork unitOfWork)
         {
-            _groupServices = groupServices;
             _unitOfWork = unitOfWork;
         }
 
@@ -23,7 +21,8 @@ namespace Stokvel_Groups_Home_RSA.Services.GroupServices
         public async Task<decimal> CalculateAmountTarget(int groupId)
         {
             var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
-            if (group == null || group.TotalGroupMembers <= 1)
+
+            if (group == null )
             {
                 throw new InvalidOperationException("Invalid group or insufficient group members.");
             }
@@ -38,7 +37,37 @@ namespace Stokvel_Groups_Home_RSA.Services.GroupServices
             return _unitOfWork.GroupsRepository.GroupExists(verifyKey);
         }
 
+        public async Task<PagedList.IPagedList<Group>> FilterAccountUsers(string? sortOrder, string? currentFilter, string? searchString, int? page)
+        {
+            var groups = from g in await _unitOfWork.GroupsRepository.GetAllAsync()
+                         select g;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                groups = groups.Where(g => g.GroupName.Contains(searchString)
+                                       || g.VerifyKey.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    groups = groups.OrderByDescending(g => g.TypeAccount);
+                    break;
+                case "Date":
+                    groups = groups.OrderBy(g => g.TypeAccount);
+                    break;
+                case "date_desc":
+                    groups = groups.OrderByDescending(g => g.GroupDate);
+                    break;
+                default:
+                    groups = groups.OrderBy(g => g.GroupDate);
+                    break;
+            }
 
-        public Task<IPagedList<Group>> FilterAccountUsers(string? sortOrder, string? currentFilter, string? searchString, int? page) => _groupServices.FilterAccountUsers(sortOrder, currentFilter, searchString, page);
+
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            PagedList.IPagedList<Group> resultList = groups.ToPagedList(pageNumber, pageSize);
+            return resultList;
+        }
+
     }
 }

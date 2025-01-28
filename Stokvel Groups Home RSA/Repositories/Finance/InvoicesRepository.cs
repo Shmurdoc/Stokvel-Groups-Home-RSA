@@ -13,7 +13,7 @@ namespace Stokvel_Groups_Home_RSA.Repositories.Finance
             _context = context;
         }
 
-        public void Update(Invoice invoice)
+        public void Update(Invoice? invoice)
         {
             _context.Invoices.Update(invoice);
         }

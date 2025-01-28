@@ -25,93 +25,178 @@
             </nav>
 
 
-            <!-- row -->
-            <div class="row column1">
-                <div class="col-md-12">
-                    <div class="white_shd full margin_bottom_30">
-                        <div class="full graph_head">
-                            <div class="heading1 margin_0">
-                                <h2>Join a Group</h2>
-                            </div>
-                        </div>
-                        <div class="full price_table padding_infor_info">
-                            <div class="row">
-
-
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <form asp-action="Create">
-                                  
-                                    @if (@ViewBag.PreDepo != 0)
-                                    {
-                                        <p> Remember to not deposit beyond the Target Amount  </p>
-
-                                        <div class="form-group">
-                                            <label class="control-label"> Target Amount</label>
-                                            <input value="@ViewBag.TargetAmount" disabled class="form-control" />
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label"> Wallet Amount</label>
-                                            <input value="@ViewBag.PreDepo" disabled class="form-control" />
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="form-group">
-                                            <label class="control-label"> PreDeposit</label>
-                                            <input id="memberTarget" value="@(ViewBag.MemberTarget - ViewBag.PreDepoAmount)" disabled class="form-control" />
-                                            <p id="preDepoAmount" hidden>ViewBag.PreDepoAmount</p>
-                                            <p id="groupStatus" hidden>@ViewBag.GroupStatus</p>
-                                        </div>
-                                    }
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                            <div class="form-group">
-                                        <label asp-for="DepositAmount" id="depositAmountName" class="control-label"></label>
-                                                <input asp-for="DepositAmount" id="depositAmount" class="form-control" />
-                                                <span asp-validation-for="DepositAmount" class="text-danger"></span>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="submit" value="Deposit" class="btn btn-primary" />
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <a asp-action="Index">Back to List</a>
-                                </div>
-                                @section Scripts {
-                                    @{
-                                        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-                                    }
-                                }
-
-                            </div>
-                        </div>
+    <div class="row column1">
+        <div class="col-md-12">
+            <div class="white_shd full margin_bottom_30">
+                <div class="full graph_head">
+                    <div class="heading1 margin_0">
+                        <h2>Join a Group</h2>
                     </div>
                 </div>
+                <div class="full price_table padding_infor_info">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <form asp-action="Create" id="myForm">
+                                @if (ViewBag.PreDepo > 0)
+                                {
+                                    <div class="form-group">
+                                        <label class="control-label">PreDeposit</label>
+                                        <input id="memberTarget" value="@ViewBag.PreDepo" disabled class="form-control" />
+                                        <p id="preDepoAmount" hidden></p>
+                                        <p id="groupStatus" hidden>@ViewBag.GroupStatus</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Wallet Amount</label>
+                                        <input value="@ViewBag.Wallet" disabled class="form-control" />
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="control-label">Select type</label>
+                                        <select class="form-control" id="dropdown" name="cars">
+                                            <option value="PayNow">PayNow</option>
+                                            @if (ViewBag.AllowPendingPayment == true)
+                                            {
+                                                <option value="PendingPayment">PendingPayment</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p>Remember to not deposit beyond the Target Amount</p>
+                                    <div class="form-group">
+                                        <label class="control-label">Target Amount</label>
+                                        <input id="targetAmount" value="@ViewBag.TargetAmount" disabled class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Select type</label>
+                                        <select class="form-control" id="dropdown" name="cars">
+                                            <option value="PayNow">PayNow</option>
+                                            @if (ViewBag.AllowPendingPayment == true)
+                                            {
+                                                <option value="PendingPayment">PendingPayment</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                                @Html.Hidden("dropdownValue", "")
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="DepositAmount" id="depositAmountName" class="control-label"></label>
+                                    <input asp-for="DepositAmount" id="depositAmount" class="form-control" />
+                                    <span asp-validation-for="DepositAmount" id="depositAmountValidation" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" id="submit" class="btn btn-primary">Deposit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                    @section Scripts {
+                        @{
+                            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                        }
+                    }
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>
+
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-       
-        var memberTarget = document.getElementById('memberTarget');
-        var groupStatus = document.getElementById('groupStatus').innerHTML;
-        var depositAmount = document.getElementById('depositAmount');
-        var depositAmountName = document.getElementById('depositAmountName');
-        var preDepoAmount = document.getElementById('preDepoAmount');
-        var totalPaid = memberTarget.value - preDepoAmount.value;
-        var status = "False";
+        // Initialize variables with ViewBag values
+        var targetAmount = document.getElementById('targetAmount');
+        var memberTarget = parseFloat('@ViewBag.TargetAmount');
+        var preDepoAmount = parseFloat('@ViewBag.PreDepo');
+        var allowPendingPayment = '@ViewBag.AllowPendingPayment' === 'True';
+        var groupActive = '@ViewBag.Group';
 
-        if (totalPaid === 0 && groupStatus === status) {
-            depositAmount.style.display = 'none';
-            depositAmountName.style.display = 'none';
+        // Get DOM elements
+        var depositAmount = document.getElementById('depositAmount');
+        var submitButton = document.getElementById('submit');
+        var dropdown = document.getElementById('dropdown');
+        var depositAmountValidation = document.getElementById('depositAmountValidation');
+
+        // Calculate pre-deposit pending amount
+        var preDepositPending = memberTarget / 5;
+
+
+
+        if (preDepoAmount > 0 || groupActive === true) {
+            submitButton.style.display = 'block';
+            alert(preDepoAmount.toFixed(2));
+        } else {
+            submitButton.style.display = 'none';
+            alert(preDepoAmount.toFixed(2));
         }
+
+
+        document.getElementById('dropdown').addEventListener('change', function () {
+            document.getElementsByName('dropdownValue')[0].value = this.value;
+        });
+
+
+        // Ensure depositValue is initialized
+        var depositValue = depositAmount.value ? parseFloat(depositAmount.value) : 0;
+
+        // Function to handle dropdown change
+        function handleDropdownChange() {
+            if (dropdown.value === 'PendingPayment' && allowPendingPayment === true) {
+                if (parseFloat(depositAmount.value) !== preDepositPending) {
+
+                    document.getElementById('targetAmount').value = preDepositPending;
+                } 
+            } else {
+                document.getElementById('targetAmount').value = memberTarget;
+            }
+        }
+
+        // Function to handle form submission
+        function handleFormSubmission(event) {
+            var depositValue = parseFloat(depositAmount.value);
+            if ((depositValue === preDepositPending && dropdown.value === 'PendingPayment') ||
+                (preDepoAmount + depositValue >= memberTarget && dropdown.value !== 'PendingPayment')) {
+                var g = document.getElementById('dropdown').value;
+                    document.getElementsByName('dropdownValue')[0].value = document.getElementById('dropdown').value;
+                alert("hhhh");
+                alert(g);
+                document.getElementById('myForm').submit();
+            } else {
+                event.preventDefault();
+                if (dropdown.value === 'PendingPayment') {
+                    depositAmountValidation.innerHTML = "Please deposit the required amount for PendingDeposit: R" + preDepositPending;
+                } else {
+                    if ((preDepoAmount + depositValue) >= memberTarget) {
+                        depositAmountValidation.innerHTML = "The required amount is R" + (memberTarget - preDepoAmount) + ". The excess amount of R" + ((preDepoAmount + depositValue) - memberTarget) + " will go to the wallet.";
+                    } else {
+                        depositAmountValidation.innerHTML = "Please deposit the required amount for Pre-Deposit: R" + memberTarget;
+                    }
+                }
+            }
+        }
+
+        // Event listener for dropdown change
+        dropdown.addEventListener('change', handleDropdownChange);
+
+        // Event listener for submit button click
+        submitButton.addEventListener('click', handleFormSubmission);
+
+        // Prevent form submission on Enter key press
+        document.getElementById('myForm').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+            }
+        });
     });
 </script>
-                    
+
+
+
+             

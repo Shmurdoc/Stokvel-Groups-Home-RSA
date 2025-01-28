@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IMessageServices;
 using Stokvel_Groups_Home_RSA.Data;
-using Stokvel_Groups_Home_RSA.Interface.Infrastructure;
 using Stokvel_Groups_Home_RSA.Interface.IRepo;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IAccountProfileServices;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IAccountRequestService;
@@ -15,9 +15,11 @@ using Stokvel_Groups_Home_RSA.Services.AccountRequestService;
 using Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepositService;
 using Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepositSet;
 using Stokvel_Groups_Home_RSA.Services.GroupServices;
-using Stokvel_Groups_Home_RSA.Services.InputFolders;
 using Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositInfo;
 using Stokvel_Groups_Home_RSA.Services.WalletRequestService.Wallet;
+using Stokvel_Groups_Home_RSA.Hubs;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IWithdrawServices;
+using Stokvel_Groups_Home_RSA.Services.WithdrawServices;
 
 namespace Stokvel_Groups_Home_RSA.Controllers;
 
@@ -58,14 +60,16 @@ public class Program
 
 
         builder.Services.AddTransient<IAccountProfileRequestServices, AccountProfileServices>();
-        builder.Services.AddTransient<IGroupServices, GroupServices>();
+        
         builder.Services.AddTransient<WalletInfo>();
         builder.Services.AddTransient<PreDepositInfo>();
         builder.Services.AddTransient<IDepositSet, DepositSet>();
         builder.Services.AddTransient<IPreDepositRequestServices, PreDepositInfo>();
         builder.Services.AddTransient<IWalletRequestServices, WalletInfo>();
-        builder.Services.AddTransient<IInputFoldersRepository, InputFolders>();
         //services
+
+        builder.Services.AddTransient<IWithdrawServices, WithdrawServices>();
+        builder.Services.AddTransient<IWithdrawRequestService, WithdrawRequestService>();
         builder.Services.AddTransient<IAccountRequestServices, AccountRequestServices>();
 
         builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
@@ -108,10 +112,10 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}"
             );
 
-        //app.MapHub<ChatHub>("ChatHub");
+		app.MapHub<ChatHub>("ChatHub");
 
 
-        app.MapRazorPages();
+		app.MapRazorPages();
 
         using (var scope = app.Services.CreateScope())
         {

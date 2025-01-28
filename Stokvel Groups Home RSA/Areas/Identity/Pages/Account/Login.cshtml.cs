@@ -61,7 +61,7 @@ namespace Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Account
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            ReturnUrl = returnUrl;
+            ReturnUrl = Url.Content("~/");
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -78,7 +78,7 @@ namespace Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect(Url.Content("~/"));
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -98,6 +98,6 @@ namespace Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
+        }        
     }
 }

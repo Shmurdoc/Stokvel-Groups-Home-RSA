@@ -1,28 +1,28 @@
-﻿using Stokvel_Groups_Home_RSA.Interface.Infrastructure;
+﻿using Stokvel_Groups_Home_RSA.Data;
+using Stokvel_Groups_Home_RSA.Interface.Infrastructure;
 using Stokvel_Groups_Home_RSA.Interface.IRepo;
 using Stokvel_Groups_Home_RSA.Models;
+using Stokvel_Groups_Home_RSA.Repositories;
 
 namespace Stokvel_Groups_Home_RSA.Services.InputFolders
 {
 
 
-    public class InputFolders : IInputFoldersRepository
+    public class InputFoldersRepository : Repository<ApplicationUser>, IInputFoldersRepository
     {
 
-        private readonly IUnitOfWork _unitOfWork;
+        private ApplicationDbContext _context;
         private IWebHostEnvironment _webHostEnvironment;
 
-        public InputFolders(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        public InputFoldersRepository(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment) : base(context)
         {
-            _unitOfWork = unitOfWork;
+            _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
 
 
         public async Task UploadImage(ApplicationUser? applicationUser, IFormFile? uploadedImage)
         {
-
-
             if (uploadedImage != null)
             {
                 string? uniqueFileName = null;
@@ -43,8 +43,7 @@ namespace Stokvel_Groups_Home_RSA.Services.InputFolders
                 applicationUser.MemberPhotoPath = "~/wwwroot/images/MemberProfile";
                 applicationUser.MemberFileName = uniqueFileName;
 
-                //await _context.applicationUser.AddAsync(applicationUser);
-                //await _context.SaveChangesAsync();
+                await _context.ApplicationUsers.AddAsync(applicationUser);
             }
 
         }

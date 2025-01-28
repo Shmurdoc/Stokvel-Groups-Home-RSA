@@ -16,3 +16,27 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.company-info {
+    font-size: 16px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.table td {
+    padding: 12px;
+    text-align: center;
+}
+
+

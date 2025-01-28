@@ -1,0 +1,259 @@
+﻿@using Stokvel_Groups_Home_RSA.Models.GroupedTables
+@model AccountInvoice
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int counter = 1;
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Invoice <small>( user invoice design )</small></h2>
+        </div>
+    </div>
+</div>
+<!-- row -->
+<div class="row">
+    <!-- invoice section -->
+    <div class="col-md-12">
+        <div class="white_shd full margin_bottom_30">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2><i class="fa fa-file-text-o"></i> Invoice</h2>
+                </div>
+            </div>
+            <div class="full">
+                <div class="invoice_inner">
+                    <div class="row">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="invoice-header">
+                                    <img src="path/to/your/logo.png" alt="Company Logo" class="img-fluid" />
+                                    <div class="company-info">
+                                        <h2>Pluto Admin</h2>
+                                        <p>427 Schoen Circles Suite 124, Melbourne, Australia</p>
+                                        <p><strong>Phone:</strong> <a href="tel:9876543210">9876 543 210</a></p>
+                                        <p><strong>Email:</strong> <a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>From</h4>
+                                <p>
+                                    <strong>Pluto Admin</strong><br>
+                                    427 Schoen Circles Suite 124<br>
+                                    Melbourne Australia<br>
+                                    <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>
+                                    <strong>Email : </strong><a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a>
+                                </p>
+                            </div>
+                        </div>
+                        @foreach (var item in Model.Account.Where(x=>x.AccountQueueStart.Month == DateTime.Now.Month).ToList())
+                        {
+                            
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>To</h4>
+                                <p>
+                                        <strong> @item.ApplicationUser.FirstName @item.ApplicationUser.LastName</strong><br>
+                                        @item.ApplicationUser.Address<br>
+                                        @item.ApplicationUser.Zip<br>
+                                    <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>
+                                    <strong>Email : </strong><a href="mailto:yourmail@gmail.com">@item.ApplicationUser.Email</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>Invoice No - #111457 </h4>
+                                <p>
+                                        <strong>Withdraw ID : </strong>@* @item.InvoiceDetails.InvoiceId.ToString("#00000") *@<br>
+                                        <strong>Payment Due : </strong>@* @item.InvoiceDetails.CreditedDate *@<br>
+                                    <strong>Account : </strong>11225511
+                                </p>
+                            </div>
+                        </div>
+                        }
+
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>Invoice Date:</h4>
+                                <p>@DateTime.Now.ToString("yyyy-MM-dd")</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>Payment Due:</h4>
+                                <p>@* @item.InvoiceDetails.CreditedDate?.ToString("yyyy-MM-dd") *@</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="full invoice_blog padding_infor_info padding-bottom_0">
+                                <h4>Terms:</h4>
+                                <p>Payment due within 30 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+            
+
+
+            <div class="full white_shd">
+                <div class="full graph_head">
+                    <div class="heading1 margin_0">
+                        <h2>Payment Methods</h2>
+                    </div>
+                </div>
+                <div class="full padding_infor_info">
+                    <ul class="payment_option">
+                        <li><img src="images/layout_img/visa.png" alt="#" /></li>
+                        <li><img src="images/layout_img/mastercard.png" alt="#" /></li>
+                        <li><img src="images/layout_img/american-express.png" alt="#" /></li>
+                        <li><img src="images/layout_img/paypal.png" alt="#" /></li>
+                    </ul>
+                    <p><strong>Bank Details:</strong></p>
+                    <p>Bank Name: XYZ Bank</p>
+                    <p>Account Number: 123456789</p>
+                    <p>Sort Code: 12-34-56</p>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="full padding_infor_info">
+                <div class="table_row">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Row No:</th>
+                                    <th>Full Name</th>
+                                    <th>Description</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               
+                                @foreach (var item in Model.ApplicationUser)
+                                {
+
+
+                                    <tr>
+                                        <td> @counter </td>
+                                        <td>@Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)</td>
+                                        <td>Member paid back amount to  @Model.Account.Where(x=>x.Id==item.Id).Select(x=>x.Invoices.Where(x=>x.InvoiceDate.Value.Month == DateTime.Now.Month).Select(x=>x.Description).FirstOrDefault()).FirstOrDefault() </td>
+                                        <td>R @Model.Account.Where(x => x.Id == item.Id).Select(x => x.Invoices.Where(x => x.InvoiceDate.Value.Month == DateTime.Now.Month).Sum(x => x.TotalAmount)).FirstOrDefault()</td>
+                                    </tr>
+
+                                        counter++;
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- row -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="full white_shd">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2>Payment Methods</h2>
+                </div>
+            </div>
+            <div class="full padding_infor_info">
+                <ul class="payment_option">
+                    <li><img src="images/layout_img/visa.png" alt="#" /></li>
+                    <li><img src="images/layout_img/mastercard.png" alt="#" /></li>
+                    <li><img src="images/layout_img/american-express.png" alt="#" /></li>
+                    <li><img src="images/layout_img/paypal.png" alt="#" /></li>
+                </ul>
+                <p class="note_cont">If you use this site regularly and would like to help keep the site on the Internet.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="full white_shd">
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h2>Total Amount</h2>
+                </div>
+            </div>
+            <div class="full padding_infor_info">
+                <div class="price_table">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                
+                                    <tr>
+                                        <th>Tax (9.3%)</th>
+                                        <td>R </td>
+                                    </tr> 
+                                    <tr>
+                                        <th>Total:</th>
+                                    <td>
+                                        R @ViewBag.TotalDepositedAmount
+                                    </td>
+                                    </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

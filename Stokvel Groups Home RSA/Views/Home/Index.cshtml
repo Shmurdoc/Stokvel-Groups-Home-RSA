@@ -1,5 +1,8 @@
-﻿
-  <!-- dashboard inner -->
+﻿@model IEnumerable<Deposit>
+@{
+    int count = 0;
+    
+}
 
 <div class="row column_title">
     <div class="col-md-12">
@@ -8,22 +11,31 @@
         </div>
     </div>
 </div>
-<div class="row column1">
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-user yellow_color"></i>
+
+<!-- dashboard inner -->
+@for (int i = 0; i < ViewBag.MemberGroups.Count; i++)
+{
+    <p hidden>@(count++)</p>
+
+    
+
+    <div class="row column1">
+        <div class="col-md-6 col-lg-3">
+            <div class="full counter_section margin_bottom_30">
+                <div class="couter_icon">
+                    <div>
+                        <i class="fa fa-user yellow_color"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="counter_no">
-                <div> 
-                    <p class="head_couter">Accounts</p>
+                <div class="counter_no">
+                    <div>
+                        <p class="head_couter">Account</p>
+                        <p class="head_couter">@count</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-   
+
         <div class="col-md-6 col-lg-3">
             <div class="full counter_section margin_bottom_30">
                 <div class="couter_icon">
@@ -32,124 +44,51 @@
                     </div>
                 </div>
                 <div class="counter_no">
-                    <div> 
-                        <p class="head_couter">Next Deposit</p>
+                    <div>
+                        <p class="head_couter">Last Deposit</p>
+                        <p class="head_couter">R: @ViewBag.lastDepositDate[i]</p>
                     </div>
                 </div>
             </div>
         </div>
-    
+
         <div class="col-md-6 col-lg-3">
             <div class="full counter_section margin_bottom_30">
                 <div class="couter_icon">
                     <div>
-                    <i class="fa fa-money green_color"></i>
+                        <i class="fa fa-money green_color"></i>
                     </div>
                 </div>
                 <div class="counter_no">
-                <div>
-                    
-                        <p class="head_couter">Total Owed</p>
+                    <div>
+                        <p class="head_couter">Group PayOut</p>
+                        <p class="head_couter">R: @ViewBag.totalAmount[i]</p>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="col-md-6 col-lg-3">
             <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-hourglass red_color"></i>
+                <div class="couter_icon">
+                    <div>
+                        <i class="fa fa-hourglass red_color"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="counter_no">
-                <div>
-                    
-                    <p class="head_couter">Amount Due</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-<div class="row column1">
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-user yellow_color"></i>
-                </div>
-            </div>
-            <div class="counter_no">
-                <div>
-                    
-                       
-                        <p class="total_no">Acc: @(2)</p>
-                    
-                    <p class="head_couter">Accounts</p>
+                <div class="counter_no">
+                    <div>
+                        <p class="head_couter">Amount Due</p>
+                        <p class="head_couter">R: @ViewBag.TotalDepositDue[i]</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+}
 
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-clock-o blue1_color"></i>
-                </div>
-            </div>
-            <div class="counter_no">
-                <div>
-                       
-                        
-                   
-                    <p class="head_couter">Next Deposit</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-money green_color"></i>
-                </div>
-            </div>
-            <div class="counter_no">
-                <div>
-                       
-                       
-                       
 
-                   
-                    <p class="head_couter">Total Owed</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <div>
-                    <i class="fa fa-hourglass red_color"></i>
-                </div>
-            </div>
-            <div class="counter_no">
-                <div>
-                      
-                       
-                       
-                   
-                    <p class="head_couter">Amount Due</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Calendar section -->
 <div class="col-md-12">
@@ -172,8 +111,30 @@
         
     </div>
 </div>
-<div class="row column3">
+<div class="row column4 graph">
+    <!--Member Queue Date -->
+   
+      @*   @if (await Component.InvokeAsync("MemberQueueDate") != null)
+        {
+            @await Component.InvokeAsync("MemberQueueDate")
+        } *@
+
+        @if (await Component.InvokeAsync("DailyGroupUpdate") != null)
+        {
+            @await Component.InvokeAsync("DailyGroupUpdate")
+        }
     
+
+    
+      @*   @if (await Component.InvokeAsync("MemberQueueDates") != null)
+        {
+            @await Component.InvokeAsync("MemberQueueDates")
+        } *@
+
+        @if (await Component.InvokeAsync("DailyGroupUpdates") != null)
+        {
+            @await Component.InvokeAsync("DailyGroupUpdates")
+        }
     
 </div>
 

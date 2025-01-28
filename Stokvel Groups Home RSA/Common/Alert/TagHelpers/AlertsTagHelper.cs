@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Newtonsoft.Json;
 using Stokvel_Groups_Home_RSA.common.Alert;
+using System.Text;
 
 
 
@@ -20,22 +21,26 @@ public class AlertsTagHelper : TagHelper
         output.TagName = "div";
 
         if (TempData[AlertKey] == null)
+        {
             TempData[AlertKey] = JsonConvert.SerializeObject(new HashSet<Alert>());
+        }
 
         var alerts = JsonConvert.DeserializeObject<ICollection<Alert>>(TempData[AlertKey].ToString());
 
-        var html = string.Empty;
+        var htmlBuilder = new StringBuilder();
 
         foreach (var alert in alerts)
         {
-            html += $"<div class='alert {alert.Type} mt-2' id='inner-alert' role='alert'>" +
-                        $"<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
-                            $"<span aria-hidden='true'>&times;</span>" +
-                        $"</button>" +
-                        $"{alert.Message}" +
-                    $"</div>";
+            htmlBuilder.AppendLine($@"
+                <div class='alert {alert.Type} mt-2' id='inner-alert' role='alert'>
+                    <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                        <span aria-hidden='true'>&times;</span>
+                    </button>
+                    {alert.Message}
+                </div>");
         }
 
-        output.Content.SetHtmlContent(html);
+        output.Content.SetHtmlContent(htmlBuilder.ToString());
     }
 }
+

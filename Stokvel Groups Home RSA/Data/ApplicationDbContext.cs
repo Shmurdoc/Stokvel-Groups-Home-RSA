@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Stokvel_Groups_Home_RSA.Models;
 
 namespace Stokvel_Groups_Home_RSA.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -120,12 +121,12 @@ namespace Stokvel_Groups_Home_RSA.Data
                 .HasColumnType("decimal(18,4)");
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<AccountUserPersonal>()
+            modelBuilder.Entity<ApplicationUser>()
                 .Property(p => p.Loans)
                 .HasColumnType("decimal(18,4)");
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<AccountUserPersonal>()
+            modelBuilder.Entity<ApplicationUser>()
                 .Property(p => p.RentPayment)
                 .HasColumnType("decimal(18,4)");
 
@@ -141,7 +142,7 @@ namespace Stokvel_Groups_Home_RSA.Data
 
         }
 
-        public virtual DbSet<AccountUserPersonal>? AccountUserPersonals { get; set; }
+        
         public virtual DbSet<ApplicationUser>? ApplicationUsers { get; set; }
         public virtual DbSet<AccountProfile>? AccountProfiles { get; set; }
         /*public virtual DbSet<AccountUserPersonal>? AccountUserPersonals { get; set; }*/
@@ -151,7 +152,7 @@ namespace Stokvel_Groups_Home_RSA.Data
         public virtual DbSet<Calendar>? Calendar { get; set; }
         public virtual DbSet<Invoice>? Invoices { get; set; }
         //public virtual DbSet<MemberInvoice>? MemberInvoices { get; set; }
-        //public virtual DbSet<WithdrawDetails>? WithdrawDetails { get; set; }
+        public virtual DbSet<WithdrawDetails>? WithdrawDetails { get; set; }
         //public virtual DbSet<PenaltyFee>? PenaltyFees { get; set; }
         public virtual DbSet<Deposit>? Deposits { get; set; }
         public virtual DbSet<PreDeposit>? PreDeposits { get; set; }
@@ -159,8 +160,12 @@ namespace Stokvel_Groups_Home_RSA.Data
         //public virtual DbSet<BankDetails>? BankDetails { get; set; }
         //public virtual DbSet<Wallet>? Wallets { get; set; }
         //public virtual DbSet<ApplicationUser>? ApplicationUser { get; set; }
-        //public virtual DbSet<Message>? Messages { get; set; }
-
+        public virtual DbSet<Message>? Messages { get; set; }
+        //public virtual DbSet<DepositLog>? DepositLog { get; set; }
+        //public virtual DbSet<BankDetails>? BankDetails { get; set; }
+        //public virtual DbSet<Wallet>? Wallets { get; set; }
+        //public virtual DbSet<ApplicationUser>? ApplicationUser { get; set; }
+        public DbSet<Stokvel_Groups_Home_RSA.Models.PenaltyFee>? PenaltyFee { get; set; }
 
     }
 

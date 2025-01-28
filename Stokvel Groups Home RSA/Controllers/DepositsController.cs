@@ -9,10 +9,11 @@ using Stokvel_Groups_Home_RSA.Interface.IServices.IAccountRequestService;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IDepositRequestService;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IGroupServices;
 using Stokvel_Groups_Home_RSA.Models;
+using Stokvel_Groups_Home_RSA.Models.GroupedTables;
 using Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositInfo;
 using Stokvel_Groups_Home_RSA.Services.WalletRequestService.Wallet;
 
-namespace Stokvel_Groups_Home.Controllers
+namespace Stokvel_Groups_Home_RSA.Controllers
 {
     public class DepositsController : Controller
     {
@@ -63,8 +64,20 @@ namespace Stokvel_Groups_Home.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int accountId, int groupId)
         {
+            bool preDepositExists = false;
+
             TempData["accountId"] = accountId;
             TempData["groupId"] = groupId;
+            int pendingPaymentRound = 0;
+
+            var memberDescription = await GetMemberDescription(_preDepositInfo, accountId);
+            var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
+
+            if (memberDescription >= 5)
+            {
+                pendingPaymentRound = memberDescription;
+            }
+
 
             var memberAccount = await _unitOfWork.AccountsRepository.GetByIdAsync(accountId);
             var preDeposits = await _unitOfWork.AccountsRepository.GetAllAsync(
@@ -79,7 +92,8 @@ namespace Stokvel_Groups_Home.Controllers
             var totalAccountFund = await _preDepositInfo.CheckPreDepositStatusDepositAsync(accountId);
             if (totalAccountFund?.PreDeposit?.Amount != null)
             {
-                totalAccountFund.PreDeposit.Amount = 0;
+                ViewBag.PreDepo = totalAccountFund.PreDeposit.Amount;
+                preDepositExists = true;
             }
 
             ViewBag.TargetAmount = groupMemberTarget;
@@ -87,23 +101,82 @@ namespace Stokvel_Groups_Home.Controllers
             if (groupMemberTarget == memberAccount?.PreDeposit?.Amount ||
                 totalAccountFund?.AccountProfile?.StatusRank == MemberStatuses.Platinum)
             {
-                ViewBag.PreDepo = 0;
-                ViewBag.Wallet = wallet?.Wallet?.Amount;
+                ViewBag.PreDepo = totalAccountFund.PreDeposit.Amount;
+                ViewBag.Wallet = wallet?.Wallet?.Amount ?? 0;
+                ViewBag.AllowPendingPayment = await AllowPendingPayment(groupId);
+                ViewBag.Group = group.Active;
             }
             else if (totalAccountFund?.AccountProfile?.StatusRank == MemberStatuses.PendingPayment)
             {
-                var preDepoAmount = groupMemberTarget - (groupMemberTarget / 5);
+                var preDepoAmount = groupMemberTarget - (groupMemberTarget / 5 - pendingPaymentRound);
                 ViewBag.PreDepo = preDepoAmount;
-                ViewBag.Wallet = wallet?.Wallet?.Amount;
+                ViewBag.Wallet = wallet?.Wallet?.Amount ?? 0;
+                ViewBag.AllowPendingPayment = await AllowPendingPayment(groupId);
             }
             else
             {
-                var preDepoAmount = groupMemberTarget - totalAccountFund?.PreDeposit?.Amount;
+                var preDepoAmount = groupMemberTarget - totalAccountFund?.PreDeposit?.Amount ?? 0;
+
                 ViewBag.PreDepo = preDepoAmount;
                 ViewBag.Wallet = wallet?.Wallet?.Amount;
+                ViewBag.AllowPendingPayment = await AllowPendingPayment(groupId);
             }
 
             return View();
+        }
+
+        public async Task<bool> AllowPendingPayment(int groupId)
+        {
+            bool preDepositPendingSpace = false;
+            var accountMembers = await _unitOfWork.AccountsRepository.GetAllAsync(g => g.GroupId == groupId);
+            var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
+
+            int countPendingMembers = 0;
+            int memberPendingPaymentLimit = 0;
+
+            foreach (var member in accountMembers)
+            {
+                var memberAccountProfile = await _accountProfileRequestServices.AccountProfileInfoAsync(member.Id);
+
+                if (memberAccountProfile.AccountProfile.StatusRank == MemberStatuses.PendingPayment)
+                {
+                    countPendingMembers++;
+                }
+            }
+
+            switch (group.TotalGroupMembers)
+            {
+                case 5:
+                case 6:
+                    memberPendingPaymentLimit = 1;
+                    break;
+                case 7:
+                    memberPendingPaymentLimit = 2;
+                    break;
+                case 8:
+                    memberPendingPaymentLimit = 3;
+                    break;
+                case 9:
+                    memberPendingPaymentLimit = 3;
+                    break;
+                case 10:
+                case 11:
+                    memberPendingPaymentLimit = 4;
+                    break;
+                case 12:
+                    memberPendingPaymentLimit = 5;
+                    break;
+                default:
+                    memberPendingPaymentLimit = 0;
+                    break;
+            }
+
+            if (countPendingMembers <= memberPendingPaymentLimit)
+            {
+                preDepositPendingSpace = true;
+            }
+
+            return preDepositPendingSpace;
         }
 
 
@@ -112,47 +185,58 @@ namespace Stokvel_Groups_Home.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DepositId,InvoiceId,DepositAmount,DepositDate,MethodId,PaymentStatusId,DepositReference,GroupVerifyKey")] int accountId, int groupId, Deposit deposit)
+        public async Task<IActionResult> Create([Bind("DepositId,InvoiceId,DepositAmount,DepositDate,MethodId,PaymentStatusId,DepositReference,GroupVerifyKey")] int accountId, int groupId, Deposit deposit, string dropdownValue)
         {
             accountId = GetTempDataValue("accountId", accountId);
             groupId = GetTempDataValue("groupId", groupId);
 
             var userId = User.Identity.GetUserId();
+            var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
             var memberStatus = await _accountProfileRequestServices.AccountProfileInfoAsync(userId);
-            string description = "deposit";
+            string description = "Deposit";
 
             try
             {
                 var preDepositAmount = await GetPreDepositAmount(accountId);
                 var memberDepoTarget = await _groupRequestServices.CalculateAmountTarget(groupId);
                 var memberDepoInfo = await _preDepositInfo.PreDepoMembersAsync(accountId);
-                var memberDescription = await GetMemberDescription(_preDepositInfo, accountId);
+                var memberDescription = await GetMemberDescription(_preDepositInfo, groupId);
                 var excess = CalculateExcess(_preDepositInfo, deposit, memberDepoTarget, memberDescription);
 
 
+                int pendingPaymentRound = 0;
+
+                if (memberDescription >= 5)
+                {
+                    pendingPaymentRound = memberDescription;
+                }
+
                 if (ModelState.IsValid)
                 {
+
+
                     if (await IsTargetMet(groupId, preDepositAmount))
                     {
                         deposit.DepositAmount = deposit.DepositAmount - excess;
-                        await ProcessDeposit(deposit, description, accountId, userId, excess, memberDescription, memberDepoTarget);
+                        await ProcessDeposit(deposit, description, accountId, userId, excess, memberDescription, memberDepoTarget, dropdownValue);
                         this.AddAlertSuccess("Success! Your Deposit was successful.");
                         return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        description = "PreDeposit";
+                        
 
-                        if (memberStatus?.AccountProfile?.StatusRank == MemberStatuses.PendingPayment && excess == 0)
+                        if (memberStatus?.AccountProfile?.StatusRank == MemberStatuses.PendingPayment && excess == 0 && group.Active == true)
                         {
-                            var pendingAmount = memberDepoTarget + (memberDepoTarget / 5);
+                            description = "PreDeposit";
+                            var pendingAmount = (memberDepoTarget - preDepositAmount) + (memberDepoTarget / 5 - memberDescription);
 
-                            ModelState.AddModelError("DepositAmount", "Deposit amount must be" + pendingAmount + ".");
+                            ModelState.AddModelError("DepositAmount", "Deposit amount must be R"+ pendingAmount + ".");
                             return View(deposit);
                         }
-                        else
+                        else //
                         {
-                            await ProcessDeposit(deposit, description, accountId, userId, excess, memberDescription, memberDepoTarget);
+                            await ProcessDeposit(deposit, description, accountId, userId, excess, memberDescription, memberDepoTarget, dropdownValue);
                             this.AddAlertSuccess("Success! Your Deposit was successful.");
                         }
                     }
@@ -184,10 +268,10 @@ namespace Stokvel_Groups_Home.Controllers
             return preDepo?.Select(x => x.PreDeposit?.Amount).FirstOrDefault() ?? 0.00m;
         }
 
-        private async Task<int> GetMemberDescription(PreDepositInfo? memberDepoInfo, int accountId)
+        private async Task<int> GetMemberDescription(PreDepositInfo? memberDepoInfo, int groupId)
         {
-            var groupAccount = await _unitOfWork.AccountsRepository.GetAllAsync();
-            return groupAccount.Where(x => x.GroupId == memberDepoInfo?.AccountPreDeposit?.Account?.GroupId && x.AccountQueueStart.Month == DateTime.Now.Month)
+            var groupAccount = await _unitOfWork.AccountsRepository.GetAllAsync(g=>g.GroupId == groupId);
+            return groupAccount.Where(x => x.AccountQueueStart.Month == DateTime.Now.Month)
                                .Select(x => x.AccountQueue).FirstOrDefault();
         }
 
@@ -216,7 +300,7 @@ namespace Stokvel_Groups_Home.Controllers
             return groupMember.AccountTarget == preDepositAmount;
         }
 
-        private async Task ProcessDeposit(Deposit deposit, string description, int accountId, string userId, decimal excess, int memberDescription, decimal memberDepoTarget)
+        private async Task ProcessDeposit(Deposit deposit, string description, int accountId, string userId, decimal excess, int memberDescription, decimal memberDepoTarget, string dropdownValue)
         {
             var memberPreDepoAccountList = await _unitOfWork.PreDepositRepository.GetAllAsync(x => x.AccountId == accountId);
             var profileStatus = await _accountProfileRequestServices.AccountProfileInfoAsync(userId);
@@ -235,30 +319,31 @@ namespace Stokvel_Groups_Home.Controllers
 
             if (excess > 0)
             {
-                await DepositToWallet(deposit, description, accountId, userId, excess, memberDepoTarget);
+                await DepositToWallet(deposit, description, accountId, userId, excess, memberDepoTarget, dropdownValue);
             }
             else
             {
                 if (profileStatus.AccountProfile.StatusRank != MemberStatuses.PendingPayment)
                 {
-                    if (memberExpectedDepoAmount?.PreDeposit?.Amount + deposit.DepositAmount <= memberPreDepoTarget)
+                    if (memberExpectedDepoAmount.PreDeposit  == null || memberExpectedDepoAmount?.PreDeposit?.Amount + deposit.DepositAmount <= memberPreDepoTarget)
                     {
                         description = "PreDeposit";
-                        await _depositService.PreDepositRequestAsync(deposit, description, accountId, userId);
+                        await _depositService.PreDepositRequestAsync(deposit, description, accountId, userId, dropdownValue);
                     }
                     else
                     {
-                        await _depositService.PreDepositRequestAsync(deposit, description, accountId, userId);
+                        await _depositService.DepositRequestAsync(deposit, description, accountId, userId, dropdownValue);
                     }
                 }
                 else
                 {
-                    await _depositService.PreDepositRequestAsync(deposit, description, accountId, userId);
+                    dropdownValue = "PendingPayment";
+                    await _depositService.PreDepositRequestAsync(deposit, description, accountId, userId, dropdownValue);
                 }
             }
         }
 
-        private async Task DepositToWallet(Deposit deposit, string? description, int accountId, string? userId, decimal excess, decimal memberDepoTarget)
+        private async Task DepositToWallet(Deposit deposit, string? description, int accountId, string? userId, decimal excess, decimal memberDepoTarget, string dropdownValue)
         {
             description = "Wallet";
             var memberStatus = await _accountProfileRequestServices.AccountProfileInfoAsync(userId);
@@ -269,12 +354,13 @@ namespace Stokvel_Groups_Home.Controllers
 
             if (memberStatus?.AccountProfile?.StatusRank == MemberStatuses.PendingPayment)
             {
+                dropdownValue = "PendingPayment";
                 if (excess <= pendingPaymentTotal)
                 {
                     excessDeposit.DepositAmount = excess;
-                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId);
+                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId, dropdownValue);
                     deposit.DepositAmount -= excess;
-                    await _depositService.DepositRequestAsync(deposit, description, accountId, userId);
+                    await _depositService.DepositRequestAsync(deposit, description, accountId, userId, dropdownValue);
                 }
                 else if (excess > pendingPaymentTotal && excess != 0)
                 {
@@ -282,12 +368,12 @@ namespace Stokvel_Groups_Home.Controllers
                     description = "Wallet";
                     excessDeposit.DepositAmount = newExcess;
                     walletMoney.Amount = newExcess;
-                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId); // Send to Wallet
+                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId, dropdownValue); // Send to Wallet
                     excessDeposit.DepositAmount = pendingPaymentTotal;
-                    await _depositService.DepositRequestAsync(deposit, description, accountId, userId);
+                    await _depositService.DepositRequestAsync(deposit, description, accountId, userId, dropdownValue);
                     await Wallet(walletMoney); // Sending to Deposit
                     deposit.DepositAmount -= excess;
-                    await _depositService.PreDepositRequestAsync(deposit, depositDescription, accountId, userId);
+                    await _depositService.PreDepositRequestAsync(deposit, depositDescription, accountId, userId, dropdownValue);
                 }
             }
             else
@@ -297,9 +383,9 @@ namespace Stokvel_Groups_Home.Controllers
                     description = "Wallet";
                     excessDeposit.DepositAmount = excess;
                     walletMoney.Amount = excess;
-                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId); // Sending to Deposit
+                    await _depositService.PreDepositRequestAsync(excessDeposit, description, accountId, userId, dropdownValue); // Sending to Deposit
                     deposit.DepositAmount -= excess;
-                    await _depositService.PreDepositRequestAsync(deposit, depositDescription, accountId, userId);
+                    await _depositService.PreDepositRequestAsync(deposit, depositDescription, accountId, userId, dropdownValue);
                 }
             }
         }

@@ -24,6 +24,6 @@ public class Invoice
 
     public decimal TotalAmount { get; set; }
 
-
-    public virtual ICollection<WithdrawDetails>? InvoiceDetails { get; set; }
+    public virtual ICollection<PenaltyFee>? PenaltyFees { get; set; }
+    public virtual ICollection<WithdrawDetails>? WithdrawDetails { get; set; }
 }

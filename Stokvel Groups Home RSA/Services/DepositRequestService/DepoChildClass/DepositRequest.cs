@@ -13,9 +13,9 @@ namespace Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass
         }
 
 
-        public async Task DepositAsync(Deposit deposit, string description, int accountId, string? userId)
+        public async Task DepositAsync(Deposit deposit, string description, int accountId, string? userId, string? dropdownValue)
         {
-            await _depositSet?.DepositToAccountAsync(deposit, description, accountId, userId);
+            await _depositSet?.DepositToAccountAsync(deposit, description, accountId, userId, dropdownValue);
         }
     }
 }

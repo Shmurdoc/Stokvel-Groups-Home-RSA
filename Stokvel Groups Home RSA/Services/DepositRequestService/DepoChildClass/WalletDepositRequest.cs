@@ -20,7 +20,7 @@ namespace Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass
         }
 
         // deposit to wallet
-        public async Task DepositAsync(Deposit deposit, string description, int accountId, string? userId)
+        public async Task DepositAsync(Deposit deposit, string description, int accountId, string? userId, string? dropdownValue)
         {
             var memberWallet = await _walletRepositoryServices?.WalletGetAmountAsync(accountId);
 
@@ -45,7 +45,7 @@ namespace Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass
                 _unitOfWork.WalletRepository.Update(wallet);
             }
 
-            await _depositSet.DepositToAccountAsync(deposit, description, accountId, userId);
+            await _depositSet.DepositToAccountAsync(deposit, description, accountId, userId, dropdownValue);
         }
 
 

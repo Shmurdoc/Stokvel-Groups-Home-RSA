@@ -12,14 +12,14 @@ using Stokvel_Groups_Home_RSA.Data;
 namespace Stokvel_Groups_Home_RSA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241027104127_StokvelGroupHome RSA")]
-    partial class StokvelGroupHomeRSA
+    [Migration("20241221163520_message")]
+    partial class message
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.33")
+                .HasAnnotation("ProductVersion", "6.0.36")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -407,12 +407,7 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("InvoiceId")
-                        .HasColumnType("int");
-
                     b.HasKey("DepositId");
-
-                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Deposits");
                 });
@@ -565,7 +560,7 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.PenaltyFee", b =>
@@ -675,49 +670,66 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     b.ToTable("WithdrawDetails");
                 });
 
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.AccountUserPersonal", b =>
+            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
+                    b.Property<bool>("AcceptedUserAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("AnnualIncome")
                         .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EmailAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerCity")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerFirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerLastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerPostalCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerProvince")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployerStreetAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LoanPurpose")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("FirstName");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("LoanPurpose")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Loans")
@@ -729,10 +741,20 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     b.Property<string>("MemberBankStatementPath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MemberFileName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MemberIdFileName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MemberIdPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MemberPhotoPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("RentPayment")
@@ -751,45 +773,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecondStreetAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("AccountUserPersonal");
-                });
-
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("FirstName");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("MemberFileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MemberPhotoPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Province")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Zip")
@@ -903,13 +886,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Deposit", b =>
-                {
-                    b.HasOne("Stokvel_Groups_Home_RSA.Models.Invoice", null)
-                        .WithMany("Deposits")
-                        .HasForeignKey("InvoiceId");
-                });
-
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.DepositLog", b =>
                 {
                     b.HasOne("Stokvel_Groups_Home_RSA.Models.Deposit", "Deposit")
@@ -1013,8 +989,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Invoice", b =>
                 {
-                    b.Navigation("Deposits");
-
                     b.Navigation("InvoiceDetails");
                 });
 

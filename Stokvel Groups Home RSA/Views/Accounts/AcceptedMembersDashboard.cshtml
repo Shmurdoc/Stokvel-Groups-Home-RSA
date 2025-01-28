@@ -36,15 +36,13 @@
 
 
 
-@if (ViewBag.StokvelActive = true)
+@if (ViewBag.StokvelActive == true)
 {
-    @* @await Component.InvokeAsync("MemberTurnProfile") *@
+    @await Component.InvokeAsync("MemberTurnProfile")
 }
 
 
-
 <alerts></alerts>
-
 
 
 <!-- row -->
@@ -64,9 +62,7 @@
                             @foreach (var member in Model.Account.Where(x => x.Id == item.Id && x.Accepted == true))
                             {
                                 <!-- column member -->
-
                                 <div class="col-md-12 col-xl-4 mt-5">
-
                                     <div class="card" style="border-radius: 15px;">
                                         <div class="card-body text-center">
                                             <div class="mt-3 mb-4">
@@ -76,91 +72,129 @@
                                                 }
                                                 else
                                                 {
-
                                                     <img src="@Url.Content("~/images/Profile/" + @item?.MemberFileName)" height="120px" width="120px" />
-
                                                 }
                                             </div>
-                                            <h4 class="mb-2">@Html.DisplayFor(modelItem => item.FirstName)  @Html.DisplayFor(modelItem => item.LastName)</h4>
+                                            <h4 class="mb-2">@Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)</h4>
                                             @if (member?.Accepted == true)
                                             {
-                                                <p class="text-muted mb-4">
-                                                    Is A Memebr Of <span class="mx-2">|</span> @Html.DisplayFor(modelItem => member.Group.GroupName)
-                                                </p>
+                                                <p class="text-muted mb-4">Is A Member Of <span class="mx-2">|</span> @Html.DisplayFor(modelItem => member.Group.GroupName)</p>
                                             }
                                             else
                                             {
-                                                <p class="text-muted mb-4">
-                                                    Would Like To Join <span class="mx-2">|</span> @Html.DisplayFor(modelItem => member.Group.GroupName)
-                                                </p>
+                                                <p class="text-muted mb-4">Would Like To Join <span class="mx-2">|</span> @Html.DisplayFor(modelItem => member.Group.GroupName)</p>
                                             }
-
                                             <p class="mb-0 text-uppercase">
-
                                                 @if (item?.Id == ViewBag.UserId)
                                                 {
-
                                                     @Html.Hidden("accountId", (object)@member.AccountId)
-                                                    <a asp-controller="Deposits" asp-action="Create" class="btn btn-primary  btn-rounded btn-lg " asp-route-accountId="@member.AccountId" asp-route-groupId="@member?.Group?.GroupId">Deposit</a>
-
-
-                                                    <br />
-                                                    <br />
-                                                    @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                    @if (@member.AccountQueueStart.Month == DateTime.Now.Month)
                                                     {
-                                                        @Html.Hidden("id", (object)@member.AccountId)
-                                                        @Html.Hidden("groupId", (object)@member.Group.GroupId)
-
-                                                        <button type="submit" class="btn btn-success btn-xs">
-                                                            <i class="fa fa-user">
-                                                            </i> <i class="fa fa-comments-o"></i>
-                                                        </button>
+                                                       <a asp-controller="WithdrawDetails" asp-action="Create" class="btn btn-warning btn-rounded btn-lg" asp-route-id="@member.AccountId">PayOut</a>
+                                                            <br /><br />
+                                                            @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                            {
+                                                            @Html.Hidden("userIdEx", (object)@member.Id)
+                                                            @Html.Hidden("accountId", (object)@member.AccountId)
+                                                                @Html.Hidden("groupId", (object)@member.Group.GroupId)
+                                                                <button type="submit" class="btn btn-success btn-xs">
+                                                                    <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
+                                                                </button>
+                                                                <br /><br />
+                                                                <a class="btn btn-info btn-rounded btn-lg text-white" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
+                                                            } 
+                                                    }else{
+                                                        <a asp-controller="Deposits" asp-action="Create" class="btn btn-primary btn-rounded btn-lg" asp-route-accountId="@member.AccountId" asp-route-groupId="@member?.Group?.GroupId">Deposit</a>
+                                                        <br /><br />
+                                                        @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                        {
+                                                            @Html.Hidden("userIdEx", (object)@member.Id)
+                                                            @Html.Hidden("accountId", (object)@member.AccountId)
+                                                            @Html.Hidden("groupId", (object)@member.Group.GroupId)
+                                                            <button type="submit" class="btn btn-success btn-xs">
+                                                                <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
+                                                            </button>
+                                                        }
+                                                        <br />
+                                                        <a class="btn btn-info btn-rounded btn-lg text-white" asp-controller="Calendars" asp-action="Index" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
                                                     }
-                                                    <br />
-                                                    <a class="btn btn-info btn-rounded btn-lg text-white" asp-controller="Calendars" asp-action="Index" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
                                                 }
                                                 else
                                                 {
                                                     @if (@member.PreDeposit != null)
                                                     {
-                                                        @if (@member.PreDeposit.Amount == member.Group.AccountTarget / (member.Group.TotalGroupMembers - 1))
+                                                        @if (@member.PreDeposit.Amount == member.Group.AccountTarget / (member.Group.TotalGroupMembers - 1) || item.AccountProfiles.StatusRank == MemberStatuses.PendingPayment && @member.PreDeposit.Amount > 0)
                                                         {
-                                                            <a class="btn btn-success btn-rounded btn-lg text-white">Ready</a>
-                                                            <br />
-                                                            <br />
-
-                                                            @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                            @if (@member.AccountQueueStart.Month == DateTime.Now.Month)
                                                             {
-                                                                @Html.Hidden("id", (object)@member.AccountId)
-                                                                @Html.Hidden("groupId", (object)@member.GroupId)
+                                                                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                                                {
+                                                                <a asp-controller="WithdrawDetails" asp-action="Index" class="btn btn-warning btn-rounded btn-lg" asp-route-groupId="@member.GroupId">Credit</a>
+                                                                    <br />
+                                                                    <br />
+                                                                    @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                                    {
+                                                                        @Html.Hidden("userIdEx", (object)@member.Id)
+                                                                        @Html.Hidden("accountId", (object)@member.AccountId)
+                                                                        @Html.Hidden("groupId", (object)@member.Group.GroupId)
+                                                                    <button type="submit" class="btn btn-success btn-xs">
+                                                                    <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
+                                                                    </button>
+                                                                    <br />
+                                                                    <br />
+                                                                    <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
+                                                                    }
+                                                                  }
+                                                                 else
+                                                                 {
+                                                                    <a class="btn btn-warning btn-rounded btn-lg text-white" >Credit</a>
+                                                                    <br />
 
-                                                                <button type="submit" class="btn btn-success btn-xs" >
-                                                                    <i class="fa fa-user">
-                                                                    </i> <i class="fa fa-comments-o"></i>
-                                                                </button>
-
-                                                                <br />
-                                                                <br />
-                                                                <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-route-groupId="@member?.Group?.GroupId">Calendar Events</a>
-                                                            }
+                                                                    <br />
+                                                                    @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                                    {
+                                                                        @Html.Hidden("userIdEx", (object)@member.Id)
+                                                                        @Html.Hidden("accountId", (object)@member.AccountId)
+                                                                        @Html.Hidden("groupId", (object)@member.Group.GroupId)
+                                                                        <button type="submit" class="btn btn-success btn-xs">
+                                                                        <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
+                                                                        </button>
+                                                                        <br />
+                                                                        <br />
+                                                                        <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
+                                                                    }
+                                                                 }
+                                                             }
+                                                             else
+                                                                {
+                                                                    <a class="btn btn-success btn-rounded btn-lg text-white">Ready</a>
+                                                                    <br /><br />
+                                                                    @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
+                                                                    {
+                                                                    @Html.Hidden("userIdEx", (object)@member.Id)
+                                                                    @Html.Hidden("accountId", (object)@member.AccountId)
+                                                                        @Html.Hidden("groupId", (object)@member.GroupId)
+                                                                        <button type="submit" class="btn btn-success btn-xs">
+                                                                            <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
+                                                                        </button>
+                                                                        <br /><br />
+                                                                        <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-route-groupId="@member?.Group?.GroupId">Calendar Events</a>
+                                                                    }
+                                                                }
                                                         }
                                                         else
                                                         {
                                                             <a class="btn btn-danger btn-rounded btn-lg text-white">Not Ready</a>
-                                                            <br />
-                                                            <br />
-
+                                                            <br /><br />
                                                             @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
                                                             {
-                                                                @Html.Hidden("id", (object)@member.AccountId)
+                                                                @Html.Hidden("userIdEx", (object)@member.Id)
+                                                                @Html.Hidden("accountId", (object)@member.AccountId)
                                                                 @Html.Hidden("groupId", (object)@member.Group.GroupId)
-
                                                                 <button type="submit" class="btn btn-success btn-xs" disabled>
-                                                                    <i class="fa fa-user">
-                                                                    </i> <i class="fa fa-comments-o"></i>
+                                                                    <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
                                                                 </button>
                                                             }
-
                                                             <br />
                                                             <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-controller="Calendars" asp-action="Index" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
                                                         }
@@ -168,106 +202,60 @@
                                                     else
                                                     {
                                                         <a class="btn btn-danger btn-rounded btn-lg text-white">Not Ready</a>
-                                                        <br />
-                                                        <br />
-
+                                                        <br /><br />
                                                         @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
                                                         {
-                                                            @Html.Hidden("id", (object)@member.AccountId)
+                                                            @Html.Hidden("userIdEx", (object)@member.Id)
+                                                            @Html.Hidden("accountId", (object)@member.AccountId)
                                                             @Html.Hidden("groupId", (object)@member.Group.GroupId)
-
-                                                            <button type="submit" class="btn btn-success btn-xs" >
-                                                                <i class="fa fa-user">
-                                                                </i> <i class="fa fa-comments-o"></i>
+                                                            <button type="submit" class="btn btn-success btn-xs">
+                                                                <i class="fa fa-user"></i> <i class="fa fa-comments-o"></i>
                                                             </button>
                                                         }
-
                                                         <br />
                                                         <a class="btn btn-info btn-rounded btn-lg text-white disabled" asp-controller="Calendars" asp-action="Index" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
-
                                                     }
-
                                                 }
-                                                @if (@member.AccountQueueStart.Month == DateTime.Now.Month)
-                                                {
-                                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                                                    {
-                                                        <a asp-controller="WithdrawDetails" asp-action="Create" class="btn btn-warning btn-rounded btn-lg" asp-route-id="@member.AccountId">Credit</a>
-
-                                                        <br />
-                                                        <br />
-
-                                                        @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
-                                                        {
-                                                            @Html.Hidden("id", (object)@member.AccountId)
-                                                            @Html.Hidden("groupId", (object)@member.Group.GroupId)
-
-                                                            <button type="submit" class="btn btn-success btn-xs">
-                                                                <i class="fa fa-user">
-                                                                </i> <i class="fa fa-comments-o"></i>
-                                                            </button>
-
-                                                            <br />
-                                                            <br />
-                                                            <a class="btn btn-info btn-rounded btn-lg text-white" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
-
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        <a class="btn btn-success btn-rounded btn-lg text-white">Ready</a>
-                                                        <br />
-                                                        <br />
-
-                                                        @using (Html.BeginForm("Index", "Messages", FormMethod.Get))
-                                                        {
-                                                            @Html.Hidden("id", (object)@member.AccountId)
-                                                            @Html.Hidden("groupId", (object)@member.Group.GroupId)
-
-                                                            <button type="submit" class="btn btn-success btn-xs">
-                                                                <i class="fa fa-user">
-                                                                </i> <i class="fa fa-comments-o"></i>
-                                                            </button>
-                                                        }
-
-                                                        <br />
-                                                        <br />
-                                                        <a class="btn btn-info btn-rounded btn-lg text-white" asp-route-groupId="@member.Group.GroupId">Calendar Events</a>
-                                                    }}
-
                                             </p>
                                             <div class="d-flex justify-content-between text-center mt-5 mb-2">
                                                 <div>
-                                                    <p class="mb-2 h5">5</p>
-                                                    <p class="text-muted mb-0">Groups Joind</p>
-                                                    <a asp-controller="InvoiceDetails" asp-action="Payment" class="btn btn-outline-primary  btn-rounded btn-sm " asp-route-id="@member.AccountId" asp-route-groupId="@member.Group.GroupId">Payments</a>
+                                                    <p class="mb-2 h5">@item.AccountProfiles.GroupsJoined</p>
+                                                    <p class="text-muted mb-0">Groups Joined</p>
+                                                    <a asp-controller="InvoiceDetails" asp-action="Payment" class="btn btn-outline-primary btn-rounded btn-sm" asp-route-id="@member.AccountId" asp-route-groupId="@member.Group.GroupId">Payments</a>
                                                 </div>
-
                                                 <div class="px-3">
                                                     <p class="mb-2 h5">@Html.DisplayFor(modelItem => member.AccountId)</p>
                                                     <p class="text-muted mb-0">Member Id</p>
-                                                    <a asp-controller="Invoices" asp-action="index" class="btn btn-outline-primary  btn-rounded btn-sm " asp-route-id="@member.AccountId">Invoice</a>
+                                                    <a asp-controller="Invoices" asp-action="index" class="btn btn-outline-primary btn-rounded btn-sm" asp-route-id="@member.AccountId">Invoice</a>
                                                 </div>
                                                 <div>
-                                                    <p class="mb-2 h5">Gold</p>
+                                                    @if(@item.AccountProfiles.StatusRank == MemberStatuses.PendingPayment)
+                                                    {
+                                                        <p class="mb-2 h5 text-wrap">Pending</p>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p class="mb-2 h5 text-wrap">@item.AccountProfiles.StatusRank</p>
+                                                    }
                                                     <p class="text-muted mb-0">Account Status</p>
-                                                    <a asp-controller="PenaltyFees" asp-action="index" class="btn btn-outline-primary  btn-rounded btn-sm" asp-route-id="@member.AccountId">Fees</a>
+                                                    <a asp-controller="PenaltyFees" asp-action="index" class="btn btn-outline-primary btn-rounded btn-sm" asp-route-id="@member.AccountId">Fees</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- end column member -->
-                            }}
+                            }
+                        }
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
-    <!-- end row -->
 </div>
+<!-- end row -->
+
+
 
 
 <!-- row -->
@@ -311,7 +299,7 @@
                                                             </div>
                                                             <div class="col-md-8 pl-2 pt-2 text-end">
                                                                 <p class="mb-0 text-uppercase">
-                                                                    @if (item.Id == @ViewBag.UserId)
+                                                                    @if (item.Id == @ViewBag.UserId && member.PreDeposit == null)
                                                                     {
 
                                                                         @using (Html.BeginForm("AcceptedMembers", "Accounts", FormMethod.Get))
@@ -328,7 +316,7 @@
                                                                     {
                                                                         @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                                                                         {
-                                                                            @if (item.Id != ViewBag.UserId)
+                                                                            @if (item.Id != ViewBag.UserId && member.PreDeposit == null)
                                                                             {
                                                                                 @using (Html.BeginForm("AcceptedMembers", "Accounts", FormMethod.Get))
                                                                                 {
@@ -340,7 +328,8 @@
                                                                                     <button type="submit" class="btn btn-danger btn-rounded btn-lg "><i class="fa fa-sign-out"></i>  Remove Member</button>
                                                                                 }
                                                                             }
-                                                                        }}
+                                                                        }
+                                                                    }
                                                                 </p>
 
                                                             </div>

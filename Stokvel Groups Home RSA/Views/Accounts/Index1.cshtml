@@ -177,7 +177,7 @@
 
 
                                                                 }
-                                                                else if (item.Id != ViewBag.UserId)
+                                                                else if (item.Id == ViewBag.UserId)
                                                                 {
                                                                         @using (Html.BeginForm("AcceptedMembersAsync", "Accounts", FormMethod.Get))
                                                                     {

@@ -3,16 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using Stokvel_Groups_Home_RSA.common.Alert.TempData;
 using Stokvel_Groups_Home_RSA.Interface.IRepo;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IAccountRequestService;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IGroupServices;
 using Stokvel_Groups_Home_RSA.Models;
 using Stokvel_Groups_Home_RSA.Models.GroupedTables;
-using Stokvel_Groups_Home_RSA.Services.GroupServices;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using System;
+using System.Globalization;
 
 namespace Stokvel_Groups_Home_RSA.Controllers
 {
@@ -28,7 +25,6 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         public static ApplicationAccount? ApplicationAccount { get; private set; }
         public static PreDepositMembers? PreDepositMembers { get; private set; }
 
-        public ApplicationUserPersonal? ApplicationUserPersonal { get; private set; }
 
         public AccountsController(
 
@@ -175,7 +171,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
             };
 
             // ViewBag Area
-            ViewBag.StokvelActive = false;
+            ViewBag.StokvelActive = preDepositMembers.Account.Select(x=>x.Group.Active).FirstOrDefault();
             ViewBag.UserId = userId;
 
             return View(preDepositMembers);
@@ -190,11 +186,12 @@ namespace Stokvel_Groups_Home_RSA.Controllers
             {
                 return RedirectToAction(nameof(IndexAdmin));
             }
+
             var userId = User.Identity.GetUserId();
 
             // Request service to get group type
             var requestAccountType = await _accountRequestService.MembersOfAccountList(userId);
-         
+
             if (requestAccountType == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Accounts' is null.");
@@ -209,12 +206,15 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> Index1(AccountType? accountType, string? groupName, int groupId)
         {
             ViewBag.image = "/wwwroot/images/Profile";
             var userId = User.Identity.GetUserId();
             var userAccounts = new List<ApplicationUser>();
+
+            ViewBag.UserId = userId;
 
             var allMembersInTypeAccount = await _accountRequestService.InAccountListAsync(userId, accountType);
             var memberAccount = allMembersInTypeAccount.Account?
@@ -296,101 +296,142 @@ namespace Stokvel_Groups_Home_RSA.Controllers
             };
 
             // ViewBag Area
-            ViewBag.StokvelActive = false;
+            ViewBag.StokvelActive = preDepositMembers.Account.Select(x=>x.Group.Active).FirstOrDefault();
             ViewBag.UserId = userId;
+            ViewData["GroupId"] = preDepositMembers.Account.Select(x => x.GroupId).FirstOrDefault();
+
 
             return View(preDepositMembers);
         }
 
 
 
-         [HttpGet]
-         public async Task<IActionResult> StartStokvel(int accountId, int groupId)
-         {
-         	var userId = User.Identity.GetUserId();
+        [HttpGet]
+        public async Task<IActionResult> StartStokvel(int accountId, int groupId)
+        {
+            var userId = User.Identity.GetUserId();
             var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
-            List<ApplicationUser> paidMembers = new();
-            List<ApplicationUser> pending = new();
-            List<ApplicationUser> notPaid = new();
 
-            if (groupId > 0)
-         	{
-              
+            if (group == null)
+            {
+                this.AddAlertDanger("Group not found. Please try again.");
+                return LocalRedirect("/Accounts/AcceptedMembersDashboard");
+            }
 
-                var account = await _unitOfWork.AccountsRepository.GetAllAsync(includeProperties:"Group");
-                var groupMembers = account.Where(x=>x.Group.GroupId == groupId).ToList();
-                
-                var applicationUserAccount = new ApplicationAccount()
-                {
-                    ApplicationUsers = new(),
-                    Account = groupMembers
-                };
+            var groupMembers = await GetGroupMembersAsync(groupId);
+            var (paidMembers, notPaidMembers) = await CategorizeMembersAsync(groupMembers, groupId);
 
-                // member not paid
-                ApplicationAccount = new()
-                {
-                    ApplicationUsers = new(),
-                    Account = new()
-                };
+            if (notPaidMembers.Any())
+            {
+                NotifyUnpaidMembers(notPaidMembers);
+                return RedirectToDashboard(group);
+            }
 
-                foreach(var members in applicationUserAccount.Account)
-                {
-                    var applicationUser = await _unitOfWork.ApplicationUserRepository.GetByIdAsync(members.Id);
-
-                    if (members.PreDeposit != null || applicationUser.AccountProfiles.StatusRank != MemberStatuses.PendingPayment)
-                    {
-                        var userTarget = await _groupRequestService.CalculateAmountTarget(groupId);
-
-                        // filter members not paid
-                        if (members.PreDeposit.Amount != userTarget || applicationUser.AccountProfiles.StatusRank != MemberStatuses.PendingPayment)
-                        {
-                            notPaid.Add(applicationUser);
-                        }
-                        else
-                        {
-                            paidMembers.Add(applicationUser);
-                        }
-                    }
-                    else
-                    {
-                            notPaid.Add(applicationUser);
-                    }
-                }
-                if (notPaid.Count > 0)
-                {
-                    foreach (var member in notPaid)
-                    {
-                        this.AddAlertDanger($"{member} Has Not Yet Paid The Deposit, Please Remind Member To Pay");
-                    }
-                    var resultStart = "/Accounts" + "/AcceptedMembersDashboard?" + "AccountType=" + group.TypeAccount.ToString() + "&" + "GroupName=" + group.GroupName;
-                    return LocalRedirect(resultStart);
-                }
-
-                if (paidMembers.Count + pending.Count == group.TotalGroupMembers)
-                {
-                    var paidList = paidMembers.OrderByDescending(x => x.AccountProfiles.Id).ToList();
-                    var pendingList = pending.OrderByDescending(x => x.AccountProfiles.MembershipRank).ToList();
-
-                    applicationUserAccount.ApplicationUsers.AddRange(paidList.Concat(pendingList).ToList());
-
-                    foreach(var member in applicationUserAccount.Account)
-                    {
-                        member.AccountQueue += 1;
-                        member.AccountQueueStart = new(year: DateAndTime.Now.Year, month: DateAndTime.Now.Month + member.AccountQueue , 1);
-                        member.AccountQueueStart = new(year: DateAndTime.Now.Year, month: DateAndTime.Now.Month + member.AccountQueue, 25);
-                         _unitOfWork.AccountsRepository.Update(member);
-                        await _unitOfWork.SaveChangesAsync();
-                    }
-                }
+            if (paidMembers.Count == group.TotalGroupMembers)
+            {
+                await UpdateMemberQueueAsync(paidMembers, groupId);
+                await UpdateGroupStatus(groupId);
             }
             else
             {
-                string status = status = "Failed!";
-                this.AddAlertDanger($"{status} Something went wrong, Pleace try again.");
+                this.AddAlertDanger("Failed! Something went wrong. Please try again.");
             }
-            var resultDone = "/Accounts" + "/AcceptedMembersDashboard?" + "AccountType=" + group.TypeAccount.ToString() + "&" + "GroupName=" + group.GroupName;
-            return LocalRedirect(resultDone);
+
+            return RedirectToDashboard(group);
         }
+
+        private async Task<List<Account>> GetGroupMembersAsync(int groupId)
+        {
+            var accounts = await _unitOfWork.AccountsRepository.GetAllAsync(includeProperties: "PreDeposit");
+            return accounts.Where(x => x.GroupId == groupId).ToList();
+        }
+
+        private async Task<(List<ApplicationUser> paidMembers, List<ApplicationUser> notPaidMembers)> CategorizeMembersAsync(List<Account> groupMembers, int groupId)
+        {
+            List<ApplicationUser> paidMembers = new();
+            List<ApplicationUser> pendingMember = new();
+            List<ApplicationUser> notPaidMembers = new();
+
+            foreach (var memberAccount in groupMembers)
+            {
+                var applicationUser = await _unitOfWork.ApplicationUserRepository.GetAllAsync(a => a.Id == memberAccount.Id, includeProperties: "AccountProfiles");
+                var userTarget = await _groupRequestService.CalculateAmountTarget(groupId);
+
+                if (memberAccount.PreDeposit != null && memberAccount.PreDeposit.Amount == userTarget)
+                {
+                    paidMembers.Add(applicationUser.SingleOrDefault());
+                }else if (applicationUser.All(x => x.AccountProfiles.StatusRank == MemberStatuses.PendingPayment))
+                {
+                    pendingMember.Add(applicationUser.SingleOrDefault());
+                }
+                else
+                {
+                    notPaidMembers.Add(applicationUser.SingleOrDefault());
+                }
+            }
+
+            paidMembers = paidMembers.Concat(pendingMember).OrderByDescending(x=>x.AccountProfiles.MembershipRank).ToList();
+
+            return (paidMembers, notPaidMembers);
+        }
+
+        private void NotifyUnpaidMembers(List<ApplicationUser> notPaidMembers)
+        {
+            foreach (var member in notPaidMembers)
+            {
+                this.AddAlertDanger($"{member.UserName} has not yet paid the deposit. Please remind the member to pay.");
+            }
+        }
+
+        private async Task UpdateMemberQueueAsync(List<ApplicationUser> paidMembers, int groupId)
+        {
+          
+
+            var orderedPaidMembers = paidMembers.OrderByDescending(x => x.AccountProfiles.Id).ToList();
+            int memberCount = 0;
+            foreach (var member in orderedPaidMembers)
+            {
+                var memberInDb = await _unitOfWork.AccountsRepository.GetAllAsync(x=>x.GroupId == groupId);
+                var memberInList = memberInDb.Where(a => a.Id == member.Id).FirstOrDefault();
+
+                if (memberInList == null)
+                {
+                    throw new Exception("Member not found in the list.");
+                }
+                
+                memberCount = memberCount+1;
+                memberInList.AccountQueue = memberCount;
+                DateTime dayStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime dayEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 25);
+                DateTime dayStartModify = dayStart.AddMonths(memberCount);
+                DateTime dayEndModify = dayStart.AddMonths(memberCount);
+
+
+                memberInList.AccountQueueStart = dayStartModify;
+                memberInList.AccountQueueEnd = dayEndModify;
+
+                _unitOfWork.AccountsRepository.Update(memberInList);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+
+        private async Task UpdateGroupStatus(int groupId)
+        {
+            var group = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
+
+            group.Active = true;
+
+            _unitOfWork.GroupsRepository.Update(group);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        private IActionResult RedirectToDashboard(Group group)
+        {
+            var resultUrl = $"/Accounts/AcceptedMembersDashboard?AccountType={group.TypeAccount}&GroupName={group.GroupName}";
+            return LocalRedirect(resultUrl);
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Index2(AccountType accountType)
@@ -399,8 +440,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
 
             //in group by type
             ApplicationAccount = await _accountRequestService.InAccountListAsync(userId, accountType);
-            var groupMembers = ApplicationAccount.Account?.GroupBy(x => x.Group?.GroupName).Select(x => x.FirstOrDefault()).ToList();
-            ApplicationAccount.Account = groupMembers;
+            
             return ApplicationAccount != null ?
                           View(ApplicationAccount) :
                           Problem("Entity set 'ApplicationDbContext.Accounts'  is null.");
@@ -459,7 +499,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
                             updateProfile.GroupsJoined += 1;
                             _unitOfWork.AccountProfileRepository.Update(updateProfile);
                         }
-
+                        account.AccountCreated = DateTime.Now;
                         await _unitOfWork.AccountsRepository.Add(account);
                         await _unitOfWork.SaveChangesAsync();
                     }

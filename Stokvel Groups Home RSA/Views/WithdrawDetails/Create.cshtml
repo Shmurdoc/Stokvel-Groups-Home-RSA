@@ -1,0 +1,90 @@
+﻿@model Stokvel_Groups_Home_RSA.Models.WithdrawDetails
+
+@{
+    ViewData["Title"] = "Credit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Credit<small> member </small></h2>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg" style="border-radius: 15px;">
+            <div class="card-header text-white text-center" style="background-color: #ff5722; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                <h4 class="m-0">Credit Details</h4>
+            </div>
+
+            <div class="card-body p-4" style="border-radius: 15px;">
+                <form asp-action="Credit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Amount to Credit -->
+                    <div class="form-group">
+                        <label asp-for="CreditAmount" class="control-label font-weight-bold">Amount to Credit</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">R</span>
+                            </div>
+                            <input asp-for="CreditAmount"
+                                   value="@ViewBag.MonthlyAmountTotalPaid.ToString("0.00")"
+                                   class="form-control" disabled
+                                   placeholder="Enter the amount to Credit"
+                                   aria-describedby="depositAmountTooltip" />
+                        </div>
+                        <span asp-validation-for="CreditAmount" class="text-danger"></span>
+                    </div>
+
+                    <!-- Admin Note -->
+                    <div class="form-group">
+                        <label for="AdminNote" class="control-label font-weight-bold">Admin Note</label>
+                        <textarea id="AdminNote" name="AdminNote"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Enter any notes for the admin here..."
+                                  aria-describedby="adminNoteTooltip"></textarea>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-group">
+                        <label for="PaymentMethod" class="control-label font-weight-bold">Payment Method</label>
+                        <select asp-for="PaymentMethod" class="form-control" required>
+                            <option value="" disabled selected>Select Payment Method</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Paypal">Paypal</option>
+                            <option value="Mobile Payment">Mobile Payment</option>
+                            <option value="Card Payment">Card Payment</option>
+                        </select>
+                        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                    </div>
+
+                    <!-- Transaction Reference -->
+                    <div class="form-group">
+                        <label for="TransactionReference" class="control-label font-weight-bold">Transaction Reference</label>
+                        <input asp-for="TransactionReference"
+                               class="form-control"
+                               placeholder="Enter the transaction reference number"
+                               aria-describedby="transactionReferenceTooltip" />
+                        <span asp-validation-for="TransactionReference" class="text-danger"></span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-outline-primary btn-lg">
+                            <i class="fa fa-paper-plane"></i> Submit Credit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+</div>

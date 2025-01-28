@@ -1,4 +1,4 @@
-﻿@model Stokvel_Groups_Home_RSA.Models.GroupedTables.ApplicationUserPersonal
+﻿@model Stokvel_Groups_Home_RSA.Models.ApplicationUser
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -39,36 +39,36 @@
                                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                             <div class="form-group">
                                                 <div class="col-md-10">
-                                                    <p>@Html.DisplayFor(model => model.ApplicationUser.Id)</p>
-                                                    <p>@Html.HiddenFor(model => model.ApplicationUser.Id)</p>
+                                                    <p>@Html.DisplayFor(model => model.Id)</p>
+                                                    <p>@Html.HiddenFor(model => model.Id)</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.FirstName" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.FirstName" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.FirstName" class="text-danger"></span>
+                                                <label asp-for="FirstName" class="control-label"></label>
+                                                <input asp-for="FirstName" value=""; class="form-control" />
+                                                <span asp-validation-for="FirstName" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.LastName" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.LastName" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.LastName" class="text-danger"></span>
+                                                <label asp-for="LastName" class="control-label"></label>
+                                                <input asp-for="LastName" class="form-control" />
+                                                <span asp-validation-for="LastName" class="text-danger"></span>
                                             </div>
                                             <div class="form-group" >
-                                               <label asp-for="AccountUserPersonal.DateOfBirth" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.DateOfBirth" type="date" class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.DateOfBirth" class="text-danger"></span>
+                                               <label asp-for="DateOfBirth" class="control-label"></label>
+                                                <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                                             </div>
                                             <div class="form-group" >
-                                                <label asp-for="ApplicationUser.PhoneNumber" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.PhoneNumber" type="text" pattern="[0-9]" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.PhoneNumber" class="text-danger"></span>
+                                                <label asp-for="PhoneNumber" class="control-label"></label>
+                                                <input asp-for="PhoneNumber" type="text" pattern="[0-9]" class="form-control" />
+                                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
                                                 <div style="text-align:center">
                                                     
                                                         <div id="test" style="height: auto; width:auto; background-color: mintcream; display:none" class="img-fluid">
 
-                                                        <label asp-for="ApplicationUser.ProfilePicture" class="control-label">Female ProfilePicture</label>
+                                                        <label asp-for="ProfilePicture" class="control-label">Female ProfilePicture</label>
                                                             <br />
                                                             <div id="image-container">
                                                                 @for (int i = 1; i <= 11; i++)
@@ -77,7 +77,7 @@
                                                                 }
                                                              </div>
 
-                                                        <label asp-for="ApplicationUser.ProfilePicture" class="control-label">Male ProfilePicture</label>
+                                                        <label asp-for="ProfilePicture" class="control-label">Male ProfilePicture</label>
                                                         <div class="form-group">
                                                             <div id="image-container">
                                                                 @for (int i = 1; i <= 7; i++)
@@ -102,36 +102,36 @@
                                             </div>
                                             </div>
                                             <div class="form-group" hidden >
-                                                <label asp-for="ApplicationUser.MemberFileName" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.MemberFileName" type="text" id="imgname" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.MemberFileName" class="text-danger"></span>
+                                                <label asp-for="MemberFileName" class="control-label"></label>
+                                                <input asp-for="MemberFileName" type="text" id="imgname" class="form-control" />
+                                                <span asp-validation-for="MemberFileName" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.ProfilePicture" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.ProfilePicture" type="file" id="imageInput" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.ProfilePicture" class="text-danger"></span>
+                                                <label asp-for="ProfilePicture" class="control-label"></label>
+                                                <input asp-for="ProfilePicture" type="file" id="imageInput" class="form-control" />
+                                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                                             </div>
                                             <img id="previewImage" alt="Preview" style="border:1px solid; border-radius:50%; width:200px; height:200px;" class="" onclick="">
                                             <br>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.Address" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.Address" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.Address" class="text-danger"></span>
+                                                <label asp-for="Address" class="control-label"></label>
+                                                <input asp-for="Address" class="form-control" />
+                                                <span asp-validation-for="Address" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.City" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.City" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.City" class="text-danger"></span>
+                                                <label asp-for="City" class="control-label"></label>
+                                                <input asp-for="City" class="form-control" />
+                                                <span asp-validation-for="City" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.Province" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.Province" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.Province" class="text-danger"></span>
+                                                <label asp-for="Province" class="control-label"></label>
+                                                <input asp-for="Province" class="form-control" />
+                                                <span asp-validation-for="Province" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="ApplicationUser.Zip" class="control-label"></label>
-                                                <input asp-for="ApplicationUser.Zip" class="form-control" />
-                                                <span asp-validation-for="ApplicationUser.Zip" class="text-danger"></span>
+                                                <label asp-for="Zip" class="control-label"></label>
+                                                <input asp-for="Zip" class="form-control" />
+                                                <span asp-validation-for="Zip" class="text-danger"></span>
                                             </div>
                                             <div class="form-group">
                                                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -169,31 +169,31 @@
                                         <div class="row disabled">
                                             <div class="col-md-6" >
                                                 <div class="form-group-sm m-1">
-                                                    <label asp-for="AccountUserPersonal.SecondAddress" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.SecondAddress" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.SecondAddress" class="text-danger"></span>
+                                                    <label asp-for="SecondAddress" class="control-label"></label>
+                                                <input asp-for="SecondAddress" disabled class="form-control" />
+                                                <span asp-validation-for="SecondAddress" class="text-danger"></span>
                                                 </div>
                                                  <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.SecondStreetAddress" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.SecondStreetAddress" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.SecondStreetAddress" class="text-danger"></span>
+                                                <label asp-for="SecondStreetAddress" class="control-label"></label>
+                                                <input asp-for="SecondStreetAddress" disabled class="form-control" />
+                                                <span asp-validation-for="SecondStreetAddress" class="text-danger"></span>
                                                 </div>
                                             <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.SecondCity" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.SecondCity" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.SecondCity" class="text-danger"></span>
+                                                <label asp-for="SecondCity" class="control-label"></label>
+                                                <input asp-for="SecondCity" disabled class="form-control" />
+                                                <span asp-validation-for="SecondCity" class="text-danger"></span>
                                             </div>
                                              </div>
                                                 <div class="col-md-6">
                                                 <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.SecondProvince" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.SecondProvince" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.SecondProvince" class="text-danger"></span>
+                                                <label asp-for="SecondProvince" class="control-label"></label>
+                                                <input asp-for="SecondProvince" disabled class="form-control" />
+                                                <span asp-validation-for="SecondProvince" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.SecondPostalCode" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.SecondPostalCode" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.SecondPostalCode" class="text-danger"></span>
+                                                <label asp-for="SecondPostalCode" class="control-label"></label>
+                                                <input asp-for="SecondPostalCode" disabled class="form-control" />
+                                                <span asp-validation-for="SecondPostalCode" class="text-danger"></span>
                                                 </div>
                                            
                                             </div>
@@ -219,46 +219,46 @@
                                 <div class="row disabled">
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerFirstName" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerFirstName" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerFirstName" class="text-danger"></span>
+                                                <label asp-for="EmployerFirstName" class="control-label"></label>
+                                                <input asp-for="EmployerFirstName" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerFirstName" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmailAddress" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmailAddress" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmailAddress" class="text-danger"></span>
+                                                <label asp-for="EmailAddress" class="control-label"></label>
+                                                <input asp-for="EmailAddress" disabled class="form-control" />
+                                                <span asp-validation-for="EmailAddress" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerStreetAddress" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerStreetAddress" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerStreetAddress" class="text-danger"></span>
+                                                <label asp-for="EmployerStreetAddress" class="control-label"></label>
+                                                <input asp-for="EmployerStreetAddress" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerStreetAddress" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerCity" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerCity" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerCity" class="text-danger"></span>
+                                                <label asp-for="EmployerCity" class="control-label"></label>
+                                                <input asp-for="EmployerCity" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerCity" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerLastName" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerLastName" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerLastName" class="text-danger"></span>
+                                                <label asp-for="EmployerLastName" class="control-label"></label>
+                                                <input asp-for="EmployerLastName" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerLastName" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerAddress" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerAddress" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerAddress" class="text-danger"></span>
+                                                <label asp-for="EmployerAddress" class="control-label"></label>
+                                                <input asp-for="EmployerAddress" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerAddress" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerProvince" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerProvince" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerProvince" class="text-danger"></span>
+                                                <label asp-for="EmployerProvince" class="control-label"></label>
+                                                <input asp-for="EmployerProvince" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerProvince" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.EmployerPostalCode" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.EmployerPostalCode" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.EmployerPostalCode" class="text-danger"></span>
+                                                <label asp-for="EmployerPostalCode" class="control-label"></label>
+                                                <input asp-for="EmployerPostalCode" disabled class="form-control" />
+                                                <span asp-validation-for="EmployerPostalCode" class="text-danger"></span>
                                         </div>
                                     </div>
                                    
@@ -285,28 +285,28 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.AnnualIncome" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.AnnualIncome" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.AnnualIncome" class="text-danger"></span>
+                                                <label asp-for="AnnualIncome" class="control-label"></label>
+                                                <input asp-for="AnnualIncome" disabled class="form-control" />
+                                                <span asp-validation-for="AnnualIncome" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.Loans" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.Loans" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.Loans" class="text-danger"></span>
+                                                <label asp-for="Loans" class="control-label"></label>
+                                                <input asp-for="Loans" disabled class="form-control" />
+                                                <span asp-validation-for="Loans" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.RentPayment" class="control-label"></label>
+                                                <label asp-for="RentPayment" class="control-label"></label>
                                                 <input type="text" class="form-control" disabled id="myRange" value="90" />
-                                                <input asp-for="AccountUserPersonal.RentPayment" type="range" size="2" name="satisfaction" min="0" max="1000000" value="3" onmouseover="range(txt)()">
+                                                <input asp-for="RentPayment" type="range" size="2" name="satisfaction" min="0" max="1000000" value="3" onmouseover="range(txt)()">
 
-                                                <span asp-validation-for="AccountUserPersonal.RentPayment" class="text-danger"></span>
+                                                <span asp-validation-for="RentPayment" class="text-danger"></span>
                                         </div>
                                         <div class="form-group-sm m-1">
-                                                <label asp-for="AccountUserPersonal.LoanPurpose" class="control-label"></label>
-                                                <input asp-for="AccountUserPersonal.LoanPurpose" disabled class="form-control" />
-                                                <span asp-validation-for="AccountUserPersonal.LoanPurpose" class="text-danger"></span>
+                                                <label asp-for="LoanPurpose" class="control-label"></label>
+                                                <input asp-for="LoanPurpose" disabled class="form-control" />
+                                                <span asp-validation-for="LoanPurpose" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -332,22 +332,22 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                        <label asp-for="AccountUserPersonal.IdFile" class="control-label">Upload ID</label>
+                                        <label asp-for="IdFile" class="control-label">Upload ID</label>
                                             <div class="drop-zone">
                                                 <span class="drop-zone__prompt">Drop file here or click to upload</span>
-                                            <input asp-for="AccountUserPersonal.IdFile" type="file" name="myFile" class="drop-zone__input">
+                                            <input asp-for="IdFile" type="file" name="myFile" class="drop-zone__input">
                                             </div>
-                                        <span asp-validation-for="AccountUserPersonal.IdFile" class="text-danger"></span>
+                                        <span asp-validation-for="IdFile" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group-sm m-1">
-                                        <label asp-for="AccountUserPersonal.BankStatementFile" class="control-label">Upload Bank Statement</label>
+                                        <label asp-for="BankStatementFile" class="control-label">Upload Bank Statement</label>
                                             <div class="drop-zone">
                                                 <span class="drop-zone__prompt">Drop file here or click to upload</span>
-                                            <input asp-for="AccountUserPersonal.BankStatementFile" type="file" name="myFile" class="drop-zone__input">
+                                            <input asp-for="BankStatementFile" type="file" name="myFile" class="drop-zone__input">
                                             </div>
-                                        <span asp-validation-for="AccountUserPersonal.BankStatementFile" class="text-danger"></span>
+                                        <span asp-validation-for="BankStatementFile" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div>
@@ -497,6 +497,17 @@ function insertText(txt)
 
 
 
+
+
+<script>
+    window.onbeforeunload = function() {
+        return 'You have unsaved changes. Are you sure you want to leave?';
+    };
+
+    document.getElementById('myForm').addEventListener('submit', function() {
+        window.onbeforeunload = null;
+    });
+</script>
 
 
 

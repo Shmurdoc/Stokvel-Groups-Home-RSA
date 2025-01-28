@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Stokvel_Groups_Home_RSA.Migrations
 {
-    public partial class StokvelGroupHomeRSA : Migration
+    public partial class SGH : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,6 +29,16 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    MemberPhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MemberFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Province = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Zip = table.Column<int>(type: "int", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AcceptedUserAccount = table.Column<bool>(type: "bit", nullable: true),
                     SecondAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecondStreetAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecondCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -50,15 +61,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     MemberIdFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MemberBankStatementPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MemberBankStatementFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MemberPhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MemberFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Province = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Zip = table.Column<int>(type: "int", nullable: true),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -77,6 +79,21 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Deposits",
+                columns: table => new
+                {
+                    DepositId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DepositAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    DepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepositReference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Deposits", x => x.DepositId);
                 });
 
             migrationBuilder.CreateTable(
@@ -297,6 +314,49 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BankDetails",
+                columns: table => new
+                {
+                    BankDetailId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountNumber = table.Column<int>(type: "int", nullable: false),
+                    InvestmentId = table.Column<int>(type: "int", nullable: false),
+                    DepositId = table.Column<int>(type: "int", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankDetails", x => x.BankDetailId);
+                    table.ForeignKey(
+                        name: "FK_BankDetails_Deposits_DepositId",
+                        column: x => x.DepositId,
+                        principalTable: "Deposits",
+                        principalColumn: "DepositId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepositLog",
+                columns: table => new
+                {
+                    LogId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LogMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepositId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositLog", x => x.LogId);
+                    table.ForeignKey(
+                        name: "FK_DepositLog_Deposits_DepositId",
+                        column: x => x.DepositId,
+                        principalTable: "Deposits",
+                        principalColumn: "DepositId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Accounts",
                 columns: table => new
                 {
@@ -355,75 +415,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PreDeposits",
-                columns: table => new
-                {
-                    PreDepositId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PreDepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    AccountId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PreDeposits", x => x.PreDepositId);
-                    table.ForeignKey(
-                        name: "FK_PreDeposits_Accounts_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Accounts",
-                        principalColumn: "AccountId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BankDetails",
-                columns: table => new
-                {
-                    BankDetailId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AccountNumber = table.Column<int>(type: "int", nullable: false),
-                    InvestmentId = table.Column<int>(type: "int", nullable: false),
-                    DepositId = table.Column<int>(type: "int", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BankDetails", x => x.BankDetailId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DepositLog",
-                columns: table => new
-                {
-                    LogId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LogMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DepositId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DepositLog", x => x.LogId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Deposits",
-                columns: table => new
-                {
-                    DepositId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DepositAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    DepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DepositReference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    InvoiceId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Deposits", x => x.DepositId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Invoices",
                 columns: table => new
                 {
@@ -449,6 +440,27 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         column: x => x.DepositId,
                         principalTable: "Deposits",
                         principalColumn: "DepositId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PreDeposits",
+                columns: table => new
+                {
+                    PreDepositId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PreDepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    AccountId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PreDeposits", x => x.PreDepositId);
+                    table.ForeignKey(
+                        name: "FK_PreDeposits_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "AccountId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -554,11 +566,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 column: "DepositId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Deposits_InvoiceId",
-                table: "Deposits",
-                column: "InvoiceId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Invoices_AccountId",
                 table: "Invoices",
                 column: "AccountId");
@@ -593,44 +600,10 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 name: "IX_WithdrawDetails_PenaltyFeeId",
                 table: "WithdrawDetails",
                 column: "PenaltyFeeId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_BankDetails_Deposits_DepositId",
-                table: "BankDetails",
-                column: "DepositId",
-                principalTable: "Deposits",
-                principalColumn: "DepositId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_DepositLog_Deposits_DepositId",
-                table: "DepositLog",
-                column: "DepositId",
-                principalTable: "Deposits",
-                principalColumn: "DepositId",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Deposits_Invoices_InvoiceId",
-                table: "Deposits",
-                column: "InvoiceId",
-                principalTable: "Invoices",
-                principalColumn: "InvoiceId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Accounts_AspNetUsers_Id",
-                table: "Accounts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Accounts_Groups_GroupId",
-                table: "Accounts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Invoices_Deposits_DepositId",
-                table: "Invoices");
-
             migrationBuilder.DropTable(
                 name: "AccountProfiles");
 
@@ -674,22 +647,22 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Invoices");
+
+            migrationBuilder.DropTable(
                 name: "PenaltyFee");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
+
+            migrationBuilder.DropTable(
+                name: "Deposits");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Groups");
-
-            migrationBuilder.DropTable(
-                name: "Deposits");
-
-            migrationBuilder.DropTable(
-                name: "Invoices");
-
-            migrationBuilder.DropTable(
-                name: "Accounts");
         }
     }
 }

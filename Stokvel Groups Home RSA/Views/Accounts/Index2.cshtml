@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <div class="row column_title">
@@ -26,64 +27,66 @@
 
 <div class="row">
 
-    @foreach (var item in Model.Account)
+    @foreach (var item in Model.Account.GroupBy(x => x.GroupId).Select(g => g.First()))
     {
-        <div class=" col-md-6">
+        <div class="col-md-6">
             <div class="card mb-5" style="border-radius: 15px;">
                 <div class="card-body p-4">
                     <h3 class="mb-3">@Html.DisplayFor(modelItem => item.Group.GroupName)</h3>
 
-                    @if (item.Group.Active == true)
+                    @if (item.Group.Active)
                     {
                         <p class="small mb-0">
                             <i class="fa fa-star fa-lg"></i> <span class="mx-2">|</span>
-                            Your Group Is <strong> Active </strong>
+                            Your Group Is <strong>Active</strong>
                         </p>
                     }
                     else
                     {
                         <p class="small mb-0">
                             <i class="fa fa-dot-circle-o fa-lg"></i> <span class="mx-2">|</span>
-                            Your Group Is<strong> Not Active </strong>
+                            Your Group Is <strong>Not Active</strong>
                         </p>
                     }
 
                     <hr class="my-4">
                     <div class="d-flex justify-content-start align-items-center">
-
                         <p class="mb-0 text-uppercase">
                             @using (Html.BeginForm("Index1", "Accounts", FormMethod.Get))
                             {
-                                @Html.Hidden("groupId", (object)item.GroupId)
-                                @Html.Hidden("AccountType", (object)item.Group.TypeAccount)
-                                @Html.Hidden("groupName", (object)item.Group.GroupName)
-                                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-external-link ms-4 me-2 text-black"></i>  Group link</button>
+                                @Html.Hidden("groupId", item.GroupId)
+                                @Html.Hidden("AccountType", item.Group.TypeAccount)
+                                @Html.Hidden("groupName", item.Group.GroupName)
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fa fa-external-link ms-4 me-2 text-black"></i> Group link
+                                </button>
                             }
                         </p>
 
-                        @foreach (var items in Model.ApplicationUsers)
+                        @foreach (var user in Model.Account.Where(x => x.GroupId == item.GroupId).Select(x=>x.ApplicationUser).Take(3))
                         {
-                            @if (Url.Content(items.MemberPhotoPath) != "/wwwroot/images/Profile")
+
+                            @if (Url.Content(user.MemberPhotoPath) != "/wwwroot/images/Profile")
                             {
-                                <img src="@Url.Content("~/images/MemberProfile/" + @items.MemberFileName)" height="50px" width="50px" alt="avatar"
-                                class="img-fluid rounded-circle me-3" width="35" />
+                                <img src="@Url.Content("~/images/MemberProfile/" + user.MemberFileName)" height="50px" width="50px" alt="avatar"
+                                     class="img-fluid rounded-circle me-3" width="35" />
                             }
                             else
                             {
-                                <img src="@Url.Content("~/images/Profile/" + @items.MemberFileName)" height="50px" width="50px" alt="avatar"
-                                class="img-fluid rounded-circle me-3" />
+                                <img src="@Url.Content("~/images/Profile/" + user.MemberFileName)" height="50px" width="50px" alt="avatar"
+                                     class="img-fluid rounded-circle me-3" />
                             }
-
                         }
 
                         <a type="button" class="btn btn-outline-light btn-sm btn-floating">
-                            <i class="bi bi-plus-circle orange_color  fa-3x"></i>
+                            <i class="bi bi-plus-circle orange_color fa-3x"></i>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     }
+
 
     <!-- tab style 2 -->
     <div class="col-md-12">
