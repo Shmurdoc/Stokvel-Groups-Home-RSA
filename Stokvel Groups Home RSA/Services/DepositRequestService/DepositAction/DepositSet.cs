@@ -32,7 +32,7 @@ namespace Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepositSet
             {
                 throw new ArgumentNullException(nameof(deposit));
             }
-
+            var depositAmount = deposit.DepositAmount;
             var newDeposit = new Deposit
             {
                 DepositId = deposit.DepositId,

@@ -45,7 +45,7 @@ public class WithdrawRequestService : IWithdrawRequestService
             {
                 var memberInvoice = currentMonthAccounts.Where(i => i.AccountId == accountId).ToList();
 
-                if (memberInvoice.Select(x => x.Invoices.Sum(x => x.TotalAmount)).FirstOrDefault() != groupTargetAmount)
+                if (memberInvoice.Select(x => x.Invoices.Sum(x => x.TotalAmount)).FirstOrDefault() < groupTargetAmount)
                 {
                     overdueMembers.Add(memberInvoice.FirstOrDefault());
                 }
@@ -178,7 +178,7 @@ public class WithdrawRequestService : IWithdrawRequestService
 
     public async Task<decimal> GetTargetAmount(int groupId)
     {
-        return await _unitOfWork.GroupRequestServices.CalculateAmountTarget(groupId);
+        return await _groupRequestServices.CalculateAmountTarget(groupId);
     }
 
 }

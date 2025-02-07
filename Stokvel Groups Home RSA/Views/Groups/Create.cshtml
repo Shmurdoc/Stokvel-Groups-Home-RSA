@@ -15,7 +15,6 @@
 
 <nav aria-label="breadcrumb" class="bg-white rounded-3 p-3 mb-4">
     <a class="btn btn-outline-danger" asp-action="Index">Back to List</a>
-    <!-- alert bar auto time dismiss -->
     <alerts></alerts>
 </nav>
 
@@ -27,13 +26,13 @@
                 <h4 class="m-0">Group Info</h4>
             </div>
             <div class="card-body p-4" style="border-radius: 15px;">
-                <form asp-action="Create">
+                <form asp-action="Create" method="post" enctype="multipart/form-data" asp-antiforgery="true" id="createGroupForm">
                     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
                     <!-- Group Name -->
                     <div class="form-group mb-3">
-                        <label asp-for="GroupName" class="control-label font-weight-bold">Group Name</label>
-                        <input asp-for="GroupName" class="form-control" placeholder="Enter a unique group name" />
+                        <label asp-for="GroupName" class="control-label"></label>
+                        <input asp-for="GroupName" class="form-control" />
                         <span asp-validation-for="GroupName" class="text-danger"></span>
                     </div>
 
@@ -48,48 +47,13 @@
                     <div class="form-group mb-3">
                         <label asp-for="TypeAccount" class="control-label font-weight-bold">Type of Account</label>
                         <select asp-for="TypeAccount" class="form-control" asp-items="@Html.GetEnumSelectList(typeof(AccountType))">
-                            <option value="">Select an Account Type</option> <!-- Optional placeholder for select -->
+                            <option value="">Select an Account Type</option>
                         </select>
                         <span asp-validation-for="TypeAccount" class="text-danger"></span>
 
                         <!-- Learn More Link -->
                         <a href="#" data-toggle="modal" data-target="#accountTypeModal">Learn More about Account Types</a>
                     </div>
-
-
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="accountTypeModal" tabindex="-1" role="dialog" aria-labelledby="accountTypeModalLabel" aria-hidden="true">
-                        <div class="modal-dialog rounded-4" role="document">
-                            <!-- Added rounded-3 here -->
-                            <div class="modal-content rounded-4">
-                                <!-- Added rounded-3 here -->
-                                <div class="modal-header text-white" style="background-color: #ff5722;">
-                                    <h5 class="modal-title" id="accountTypeModalLabel">Account Type Differences</h5>
-                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <h6>Low Savings Club:</h6>
-                                    <p>Has limited from R2000 to R6999 </p>
-
-                                    <h6>Low Savings Club::</h6>
-                                    <p>Has limited from R7000 to R13999.</p>
-
-                                    <h6>Low Savings Club::</h6>
-                                    <p>Has limited from R14 to R200000.</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-
 
                     <!-- Total Group Members -->
                     <div class="form-group mb-3">
@@ -104,25 +68,8 @@
                         <input asp-for="AccountTarget" class="form-control" placeholder="Enter the target amount for the account" />
                         <span asp-validation-for="AccountTarget" class="text-danger"></span>
                     </div>
-                </form>
 
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Withdrawal Method Section -->
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-lg" style="border-radius: 15px;">
-            <div class="card-header text-white text-center" style="background-color: #ff5722; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                <h4 class="m-0">Withdrawal Method</h4>
-            </div>
-            <div class="card-body p-4" style="border-radius: 15px;">
-                <form asp-action="Create" method="post" id="createGroupForm">
-                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-
-                    <!-- Payment Method -->
+                    <!-- Withdrawal Method Section -->
                     <div class="form-group mb-3">
                         <label for="paymentMethod" class="control-label font-weight-bold">Payment Method</label>
                         <select id="paymentMethod" name="paymentMethod" class="form-control" required>
@@ -136,7 +83,7 @@
                     <!-- Account Number -->
                     <div class="form-group mb-3">
                         <label for="accoutNumber" class="control-label font-weight-bold">Transaction Reference / Account Number</label>
-                        <input id="accoutNumber" name="accoutNumber" class="form-control" placeholder="Enter the transaction reference number" />
+                        <input id="accountNumber" name="accountNumber" class="form-control" placeholder="Enter the transaction reference number" />
                     </div>
 
                     <!-- Confirm Account Number -->
@@ -163,9 +110,7 @@
 
                     <!-- Submit Button -->
                     <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-success btn-lg" disabled id="submitBtn">
-                            Create Group
-                        </button>
+                        <button type="submit" class="btn btn-success btn-lg" disabled id="submitBtn">Create Group</button>
                     </div>
                 </form>
 
@@ -174,10 +119,31 @@
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+<!-- Modal for Account Types -->
+<div class="modal fade" id="accountTypeModal" tabindex="-1" role="dialog" aria-labelledby="accountTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog rounded-4" role="document">
+        <div class="modal-content rounded-4">
+            <div class="modal-header text-white" style="background-color: #ff5722;">
+                <h5 class="modal-title" id="accountTypeModalLabel">Account Type Differences</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Low Savings Club:</h6>
+                <p>Limited from R2000 to R6999.</p>
+
+                <h6>Medium Savings Club:</h6>
+                <p>Limited from R7000 to R13999.</p>
+
+                <h6>High Savings Club:</h6>
+                <p>Limited from R14000 to R200000.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 

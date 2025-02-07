@@ -11,6 +11,7 @@ using Stokvel_Groups_Home_RSA.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Xml.Linq;
 
 namespace Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Account
 {
@@ -87,14 +88,12 @@ namespace Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Account
 
             Input = new InputModel()
             {
-                RoleList = _roleManager.Roles.Where(x => x.Name != "SuperUser").Select(x => x.Name).Select(i => new SelectListItem
+                RoleList = _roleManager.Roles.Where(x => x.Name != "SuperUser" && x.Name != "Admin").Select(x => x.Name).Select(i => new SelectListItem
                 {
-
                     Text = i,
                     Value = i
 
                 })
-
             };
         }
 

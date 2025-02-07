@@ -12,10 +12,12 @@ namespace Stokvel_Groups_Home_RSA.ViewComponents
     public class DailyGroupUpdatesViewComponent : ViewComponent
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHomeRequestService _homeRequestService;
 
-        public DailyGroupUpdatesViewComponent(IUnitOfWork unitOfWork)
+        public DailyGroupUpdatesViewComponent(IUnitOfWork unitOfWork, IHomeRequestService homeRequestService)
         {
             _unitOfWork = unitOfWork;
+            _homeRequestService = homeRequestService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -30,8 +32,8 @@ namespace Stokvel_Groups_Home_RSA.ViewComponents
                 return View(null);
             }
 
-            var memberList = await _unitOfWork.HomeRequestService.GetApplicationAccountDetailsAsync(groupId[1]);
-            var groupMembers = await _unitOfWork.HomeRequestService.GetDepositDetailsAsync(groupId[1]);
+            var memberList = await _homeRequestService.GetApplicationAccountDetailsAsync(groupId[1]);
+            var groupMembers = await _homeRequestService.GetDepositDetailsAsync(groupId[1]);
             var order = groupMembers.OrderBy(x => x.DepositDate).Take(5).ToList();
 
             return await Task.FromResult<IViewComponentResult>(View(order.AsEnumerable().ToList())) ?? null;

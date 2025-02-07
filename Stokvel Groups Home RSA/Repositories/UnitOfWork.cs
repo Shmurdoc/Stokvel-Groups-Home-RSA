@@ -18,6 +18,7 @@ using Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass;
 using Stokvel_Groups_Home_RSA.Services.GroupServices;
 using Stokvel_Groups_Home_RSA.Services.HomeService;
 using Stokvel_Groups_Home_RSA.Services.InputFolders;
+using Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositInfo;
 
 namespace Stokvel_Groups_Home_RSA.Repositories
 {
@@ -40,15 +41,9 @@ namespace Stokvel_Groups_Home_RSA.Repositories
         public IWithdrawRepository WithdrawRepository { get; private set; }
         public IWalletRepository WalletRepository { get; private set; }
 
-        // Service areas
-        public IGroupRequestServices GroupRequestServices { get; private set; }
-        public IHomeRequestService HomeRequestService { get; private set; }
-        public IPreDepositRequestServices PreDepositRequestServices { get; private set; }
-        public IDepositRequestServices DepositRequestServices { get; private set; }
-        public IDepositRequestServices PreDepositDepositRequestServices { get; private set; }
-        public IDepositRequestServices WalletDepositRequestServices { get; private set; }
-        public IDepositSet DepositSet { get; private set; }
-        public IWalletRequestServices WalletRequestServices { get; private set; }
+       
+
+        public PreDepositInfo PreDepositInfo { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -69,12 +64,6 @@ namespace Stokvel_Groups_Home_RSA.Repositories
             WithdrawRepository = new WithdrawRepository(_context);
             WalletRepository = new WalletRepository(_context);
 
-            // Initialize service areas
-            GroupRequestServices = new GroupRequestServices(this);
-            HomeRequestService = new HomeRequestService(this);
-            DepositRequestServices = new DepositRequest(DepositSet);
-            PreDepositDepositRequestServices = new PreDepositDepositRequest(PreDepositRequestServices, DepositSet, this);
-            WalletDepositRequestServices = new WalletDepositRequest(this, DepositSet, WalletRequestServices);
         }
 
         public IRepository<ApplicationUser> UserRepository { get; private set; }

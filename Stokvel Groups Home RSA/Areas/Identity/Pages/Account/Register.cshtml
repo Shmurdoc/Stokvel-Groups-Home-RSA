@@ -49,14 +49,24 @@
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="form-floating">
-                <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select" aria-required="true">
-                    <option disabled selected> </option>
-                    </select>
-</select>
-                <label asp-for="Input.Role"></label>
-                <span asp-validation-for="Input.Role" class="text-danger"></span>
-            </div>
+                        <div class="form-floating">
+                            <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select" aria-required="true" id="roleSelect1">
+                                <option disabled selected> </option>
+                            </select>
+                            <label asp-for="Input.Role"></label>
+                            <span asp-validation-for="Input.Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating">
+                            <select class="form-select" aria-required="true" id="roleSelect2">
+                                <option disabled selected> </option>
+                                <option>Manager</option>
+                                <option>Member</option>
+                            </select>
+                            <label asp-for="Input.Role"></label>
+                            <div id="roleWarning" class="text-danger" style="display:none;">The selected roles do not match!</div>
+                            <br />
+                        </div>
 
             <div class="form-floating">
 

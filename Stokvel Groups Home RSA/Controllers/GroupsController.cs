@@ -114,54 +114,68 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         // POST: Create Group
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GroupId,ManagerId,GroupName,VerifyKey,TypeAccount,TotalGroupMembers,GroupDate,AccountTarget,GroupStatus,Private")] Group group, string accountNumber, string paymentMethod)
+        public async Task<IActionResult> Create([Bind("GroupId,ManagerId,GroupImage,GroupName,VerifyKey,TypeAccount,TotalGroupMembers,GroupDate,AccountTarget,GroupStatus,Private")] Group group, string accountNumber, string paymentMethod)
         {
             var userId = User.Identity.GetUserId();
 
+            // Check if the group already exists based on the VerifyKey
             if (await GroupExists(group.VerifyKey))
             {
-                AddAlert("Failed!", "Group already exists. Please change Group Name and VerifyKey.");
+                AddAlert("Failed!", "Group already exists. Please change the Group Name and Verify Key.");
                 return View(group);
             }
 
+            // Validate the model state
             if (!ModelState.IsValid)
                 return View(group);
 
-            // Account creation logic
-            var account = new Account
-            {
-                Id = userId,
-                GroupId = group.GroupId,
-                GroupVerifyKey = group.VerifyKey,
-                AccountCreated = DateTime.Now,
-                Accepted = true,
-                AccoutNumber = accountNumber,
-                PaymentMethod = paymentMethod,
-            };
-
             try
             {
+                // Create a new account for the user
+                var account = CreateAccount(userId, group, accountNumber, paymentMethod);
+
+                // Set group properties
                 group.ManagerId = userId;
                 group.GroupDate = DateTime.Now;
                 group.Private = true;
                 group.GroupStatus = true;
 
+                // Add the group and save changes
                 await _unitOfWork.GroupsRepository.Add(group);
                 await _unitOfWork.SaveChangesAsync();
 
+                // Add the account to the group
                 await _accountRequestService.AddAccountToGroupAsync(account, userId);
 
-                TempData["GroupStatusCreate"] = true;
-                AddAlert("Success!", "You have created a new group successfully.");
+                TempData["GroupStatusCreate"] = true; // Store success status for view
+                AddAlert("Success!", "You have successfully created a new group.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating group.");
+                // Log the error and provide a user-friendly message
+                _logger.LogError(ex, "An error occurred while creating the group.");
                 AddAlert("Failed!", "Something went wrong. Please try again.");
             }
 
+            // Redirect to the Accounts Index page after successful creation
             return RedirectToAction("Index", "Accounts");
         }
+
+        // Helper method to create an account
+        private Account CreateAccount(string userId, Group group, string accountNumber, string paymentMethod)
+        {
+            return new Account
+            {
+                Id = userId,
+                GroupId = group.GroupId,
+                GroupVerifyKey = group.VerifyKey,
+                AccountCreated = DateTime.Now,
+                Accepted = User.IsInRole("Manager"), // Manager is automatically accepted
+                AccoutNumber = accountNumber,
+                PaymentMethod = paymentMethod,
+            };
+        }
+
 
         // GET: Edit Group
         [HttpGet]

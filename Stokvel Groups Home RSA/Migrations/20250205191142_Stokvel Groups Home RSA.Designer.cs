@@ -12,14 +12,14 @@ using Stokvel_Groups_Home_RSA.Data;
 namespace Stokvel_Groups_Home_RSA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241125175521_SGH")]
-    partial class SGH
+    [Migration("20250205191142_Stokvel Groups Home RSA")]
+    partial class StokvelGroupsHomeRSA
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.33")
+                .HasAnnotation("ProductVersion", "6.0.36")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -255,6 +255,10 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     b.Property<DateTime>("AccountQueueStart")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("AccoutNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<bool>("Blocked")
                         .HasColumnType("bit");
 
@@ -262,10 +266,16 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("GroupVerifyKey")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Id")
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("AccountId");
 
@@ -560,7 +570,7 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.PenaltyFee", b =>
@@ -570,6 +580,9 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PenaltyFeeId"), 1L, 1);
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("PenaltyAmount")
                         .HasColumnType("decimal(18,4)");
@@ -581,6 +594,8 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PenaltyFeeId");
+
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("PenaltyFee");
                 });
@@ -643,6 +658,9 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailedId"), 1L, 1);
 
+                    b.Property<string>("AccoutNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("CreditAmount")
                         .HasColumnType("decimal(18,4)");
 
@@ -655,17 +673,18 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                     b.Property<int>("PaymentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PenaltyFeeId")
-                        .HasColumnType("int");
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TaxID")
                         .HasColumnType("int");
 
+                    b.Property<string>("TransactionReference")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("DetailedId");
 
                     b.HasIndex("InvoiceId");
-
-                    b.HasIndex("PenaltyFeeId");
 
                     b.ToTable("WithdrawDetails");
                 });
@@ -779,13 +798,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.AppUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.HasDiscriminator().HasValue("AppUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -918,11 +930,22 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Message", b =>
                 {
-                    b.HasOne("Stokvel_Groups_Home_RSA.Models.AppUser", "Sender")
+                    b.HasOne("Stokvel_Groups_Home_RSA.Models.ApplicationUser", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("UserID");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.PenaltyFee", b =>
+                {
+                    b.HasOne("Stokvel_Groups_Home_RSA.Models.Invoice", "Invoice")
+                        .WithMany("PenaltyFees")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.PreDeposit", b =>
@@ -939,7 +962,7 @@ namespace Stokvel_Groups_Home_RSA.Migrations
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Wallet", b =>
                 {
                     b.HasOne("Stokvel_Groups_Home_RSA.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Wallets")
+                        .WithMany()
                         .HasForeignKey("ApplicationUserId");
 
                     b.Navigation("ApplicationUser");
@@ -948,20 +971,12 @@ namespace Stokvel_Groups_Home_RSA.Migrations
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.WithdrawDetails", b =>
                 {
                     b.HasOne("Stokvel_Groups_Home_RSA.Models.Invoice", "Invoice")
-                        .WithMany("InvoiceDetails")
+                        .WithMany("WithdrawDetails")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Stokvel_Groups_Home_RSA.Models.PenaltyFee", "PenaltyFee")
-                        .WithMany("InvoiceDetails")
-                        .HasForeignKey("PenaltyFeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Invoice");
-
-                    b.Navigation("PenaltyFee");
                 });
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Account", b =>
@@ -989,26 +1004,18 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.Invoice", b =>
                 {
-                    b.Navigation("InvoiceDetails");
-                });
+                    b.Navigation("PenaltyFees");
 
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.PenaltyFee", b =>
-                {
-                    b.Navigation("InvoiceDetails");
+                    b.Navigation("WithdrawDetails");
                 });
 
             modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.ApplicationUser", b =>
                 {
                     b.Navigation("AccountProfiles");
 
-                    b.Navigation("UserAccounts");
-
-                    b.Navigation("Wallets");
-                });
-
-            modelBuilder.Entity("Stokvel_Groups_Home_RSA.Models.AppUser", b =>
-                {
                     b.Navigation("Messages");
+
+                    b.Navigation("UserAccounts");
                 });
 #pragma warning restore 612, 618
         }

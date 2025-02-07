@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stokvel_Groups_Home_RSA.Interface.IRepo;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IGroupServices;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IHomeService;
 using Stokvel_Groups_Home_RSA.Models;
 using System.Diagnostics;
 using System.Net;
@@ -13,11 +15,15 @@ namespace Stokvel_Groups_Home_RSA.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHomeRequestService _homeRequestService;
+        private readonly IGroupRequestServices _groupRequestServices;
 
-        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, IHomeRequestService homeRequestService, IGroupRequestServices groupRequestServices)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _homeRequestService = homeRequestService;
+            _groupRequestServices = groupRequestServices;
         }
 
         public async Task<IActionResult> Index()
@@ -48,7 +54,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
 
             foreach (var groupId in groupIds)
             {
-                var groupMembers = await _unitOfWork.HomeRequestService.GetDepositDetailsAsync(groupId);
+                var groupMembers = await _homeRequestService.GetDepositDetailsAsync(groupId);
                 userInvoices.AddRange(groupMembers.Where(x => x.Invoices.Any(y => y.Account.Id == userId)).ToList());
 
                 var uniqueMonthMembers = groupMembers
@@ -75,7 +81,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         public async Task<decimal> TotalAmountTarget(int groupId)
         {
             var groupMembers = await _unitOfWork.GroupsRepository.GetByIdAsync(groupId);
-            var groupMembersTarget = await _unitOfWork.GroupRequestServices.CalculateAmountTarget(groupId);
+            var groupMembersTarget = await _groupRequestServices.CalculateAmountTarget(groupId);
             return groupMembersTarget * (groupMembers.TotalGroupMembers - 1);
         }
 
@@ -120,7 +126,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
 
         public async Task<decimal> TotalAmountDue(IEnumerable<Deposit> groupMembers, int monthMemberNumbers, int groupId)
         {
-            var totalAmount = await _unitOfWork.GroupRequestServices.CalculateAmountTarget(groupId);
+            var totalAmount = await _groupRequestServices.CalculateAmountTarget(groupId);
             var result = groupMembers
                 .Where(x => x.DepositReference == "Deposit" + monthMemberNumbers)
                 .Sum(x => x.DepositAmount);

@@ -21,7 +21,7 @@ namespace Stokvel_Groups_Home_RSA.Data
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Message>()
-                .HasOne<AppUser>(a => a.Sender)
+                .HasOne<ApplicationUser>(a => a.Sender)
                 .WithMany(d => d.Messages)
                 .HasForeignKey(d => d.UserID);
 

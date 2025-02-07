@@ -8,6 +8,7 @@ using Stokvel_Groups_Home_RSA.Interface.IServices.IHomeService;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IPreDepositRequestService;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IWithdrawServices;
 using Stokvel_Groups_Home_RSA.Interface.Messages;
+using Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositInfo;
 
 namespace Stokvel_Groups_Home_RSA.Interface.IRepo
 {
@@ -26,7 +27,6 @@ namespace Stokvel_Groups_Home_RSA.Interface.IRepo
         //finance
         //IBankDetailsRepository BankDetailsRepository { get; }
         IDepositRepository DepositRepository { get; }
-        IDepositRequestServices DepositRequestServices { get; }
         IPreDepositRepository PreDepositRepository { get; }
         IInvoicesRepository InvoicesRepository { get; }
         IInputFoldersRepository InputFoldersRepository { get; }
@@ -36,12 +36,7 @@ namespace Stokvel_Groups_Home_RSA.Interface.IRepo
         IWalletRepository? WalletRepository { get; }
         //IWithdrawRepository WithdrawRepository { get; }
 
-        //service area
-        IWithdrawRepository WithdrawRepository { get; }
-        IGroupRequestServices GroupRequestServices { get; }
-        IHomeRequestService HomeRequestService { get; }
-        IPreDepositRequestServices PreDepositRequestServices { get; }
-
+       
         Task SaveChangesAsync();
         Task<List<EntityEntry>> TrackAsync();
         void Dispose();

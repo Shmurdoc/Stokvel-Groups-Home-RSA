@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Stokvel_Groups_Home_RSA.Migrations
 {
-    public partial class SGH : Migration
+    public partial class StokvelGroupsHomeRSA : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -119,21 +119,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Groups", x => x.GroupId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PenaltyFee",
-                columns: table => new
-                {
-                    PenaltyFeeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PenaltyDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    PenaltyLevel = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PenaltyFee", x => x.PenaltyFeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -269,7 +254,7 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Message",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -285,9 +270,9 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Message", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Message_AspNetUsers_UserID",
+                        name: "FK_Messages_AspNetUsers_UserID",
                         column: x => x.UserID,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -362,13 +347,15 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 {
                     AccountId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     GroupId = table.Column<int>(type: "int", nullable: false),
-                    GroupVerifyKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GroupVerifyKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     AccountCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AccountQueue = table.Column<int>(type: "int", nullable: false),
                     AccountQueueStart = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AccountQueueEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AccoutNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Blocked = table.Column<bool>(type: "bit", nullable: false),
                     Accepted = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -465,13 +452,37 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PenaltyFee",
+                columns: table => new
+                {
+                    PenaltyFeeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InvoiceId = table.Column<int>(type: "int", nullable: false),
+                    PenaltyDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    PenaltyLevel = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PenaltyFee", x => x.PenaltyFeeId);
+                    table.ForeignKey(
+                        name: "FK_PenaltyFee_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
+                        principalColumn: "InvoiceId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WithdrawDetails",
                 columns: table => new
                 {
                     DetailedId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     InvoiceId = table.Column<int>(type: "int", nullable: false),
-                    PenaltyFeeId = table.Column<int>(type: "int", nullable: false),
+                    AccoutNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreditAmount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     TaxID = table.Column<int>(type: "int", nullable: false),
                     CreditedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -485,12 +496,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                         column: x => x.InvoiceId,
                         principalTable: "Invoices",
                         principalColumn: "InvoiceId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WithdrawDetails_PenaltyFee_PenaltyFeeId",
-                        column: x => x.PenaltyFeeId,
-                        principalTable: "PenaltyFee",
-                        principalColumn: "PenaltyFeeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -576,9 +581,14 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 column: "DepositId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_UserID",
-                table: "Message",
+                name: "IX_Messages_UserID",
+                table: "Messages",
                 column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PenaltyFee_InvoiceId",
+                table: "PenaltyFee",
+                column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PreDeposits_AccountId",
@@ -595,11 +605,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 name: "IX_WithdrawDetails_InvoiceId",
                 table: "WithdrawDetails",
                 column: "InvoiceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WithdrawDetails_PenaltyFeeId",
-                table: "WithdrawDetails",
-                column: "PenaltyFeeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -632,7 +637,10 @@ namespace Stokvel_Groups_Home_RSA.Migrations
                 name: "DepositLog");
 
             migrationBuilder.DropTable(
-                name: "Message");
+                name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "PenaltyFee");
 
             migrationBuilder.DropTable(
                 name: "PreDeposits");
@@ -648,9 +656,6 @@ namespace Stokvel_Groups_Home_RSA.Migrations
 
             migrationBuilder.DropTable(
                 name: "Invoices");
-
-            migrationBuilder.DropTable(
-                name: "PenaltyFee");
 
             migrationBuilder.DropTable(
                 name: "Accounts");

@@ -49,9 +49,6 @@ public class ApplicationUser : IdentityUser
     public bool AcceptedUserAccount { get; set; } = false;
 
 
-    public virtual IEnumerable<Account?>? UserAccounts { get; set; }
-    public virtual AccountProfile? AccountProfiles { get; set; }
-    public virtual ICollection<Wallet?>? Wallets { get; set; }
 
 
     [Phone]
@@ -138,6 +135,9 @@ public class ApplicationUser : IdentityUser
     public string? MemberBankStatementPath { get; set; }
     public string? MemberBankStatementFileName { get; set; }
 
-	public virtual ICollection<Account>? Accounts { get; set; }
+
+    
+    public virtual IEnumerable<Account?>? UserAccounts { get; set; }
+    public virtual AccountProfile? AccountProfiles { get; set; }
 	public virtual ICollection<Message>? Messages { get; set; }
 }

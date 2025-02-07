@@ -49,16 +49,30 @@ namespace Stokvel_Groups_Home_RSA.Services.PreDepositRequestService.PreDepositIn
         }
 
 
+        public async Task<List<PreDeposit>> GetMemberListPaidAsync(int accountId)
+        {
+            var memberListPaid = _unitOfWork.PreDepositRepository
+                .GetList();
+
+                var result =  memberListPaid
+                 .Where(x => x.AccountId == accountId)
+            .Include(x => x.Account)
+            .ThenInclude(a => a.Invoices)
+            .ThenInclude(i => i.Deposit)
+            .ToList();  // Fetch the result asynchronously
+
+            return result;
+        }
+
 
 
         public async Task<DepositToAccount?> PreDepoMembersAsync(int accountId)
         {
-            var memberListPaid = await _unitOfWork.PreDepositRepository.GetList()
-                .Where(x => x.AccountId == accountId)
-                .Include(x => x.Account)
-                .ThenInclude(a => a.Invoices)
-                .ThenInclude(i => i.Deposit)
-                .ToListAsync();
+            
+
+            var memberListPaid = await GetMemberListPaidAsync(accountId);
+
+
 
             var account = memberListPaid.Select(x => x.Account).FirstOrDefault();
             var invoices = memberListPaid.SelectMany(x => x.Account.Invoices).ToList();

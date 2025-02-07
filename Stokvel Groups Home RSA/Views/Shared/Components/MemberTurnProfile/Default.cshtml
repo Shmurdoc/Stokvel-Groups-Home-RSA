@@ -13,7 +13,7 @@
             <div class="full price_table padding_infor_info">
                 <div class="row">
                     <div class="row d-flex justify-content-left align-items-center h-100">
-                        <script>alert("hi");</script>
+                       
                         @foreach (var item in Model.Account)
                         {
                             <!-- Begin .page-heading -->
@@ -37,7 +37,7 @@
                                             <small> - Profile</small>
                                         </h2>
                                         <p class="lead">
-                                            This month is dedicated to a Stokvel home group member, @item.ApplicationUser.FirstName @item.ApplicationUser.LastName. Please remember to deposit before the 25th of this month to avoid penalty fees. Happy Stokvel!
+                                            @ViewBag.NextMonth month is dedicated to a Stokvel home group member, @item.ApplicationUser.FirstName @item.ApplicationUser.LastName. Please remember to deposit before the 25th of @ViewBag.NextMonth month to avoid penalty fees. Happy Stokvel!
                                         </p>
                                         <div class="row">
                                             <div class="col-md-4">
@@ -96,6 +96,8 @@
                             </div>
                         }
 
+
+                        @if(@ViewBag.Invoice == null){
                         <!-- partial:index.partial.html -->
                         <section-timeline class="cd-horizontal-timeline position-sticky border-1 mt-5 dash_head">
                             <div class="timeline">
@@ -139,6 +141,7 @@
                                 </ol>
                             </div> <!-- .events-content -->
                         </section-timeline>
+                        }
                     </div>
                 </div>
             </div>

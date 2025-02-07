@@ -404,7 +404,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
                 DateTime dayStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                 DateTime dayEnd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 25);
                 DateTime dayStartModify = dayStart.AddMonths(memberCount);
-                DateTime dayEndModify = dayStart.AddMonths(memberCount);
+                DateTime dayEndModify = dayEnd.AddMonths(memberCount);
 
 
                 memberInList.AccountQueueStart = dayStartModify;

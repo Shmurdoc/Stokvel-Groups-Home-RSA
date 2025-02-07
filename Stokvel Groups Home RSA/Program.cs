@@ -20,6 +20,11 @@ using Stokvel_Groups_Home_RSA.Services.WalletRequestService.Wallet;
 using Stokvel_Groups_Home_RSA.Hubs;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IWithdrawServices;
 using Stokvel_Groups_Home_RSA.Services.WithdrawServices;
+using Stokvel_Groups_Home_RSA.Interface.IServices.IHomeService;
+using Stokvel_Groups_Home_RSA.Services.DepositRequestService.DepoChildClass;
+using Stokvel_Groups_Home_RSA.Services.HomeService;
+using Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Admin;
+using Stokvel_Groups_Home_RSA.Areas.Identity.Pages.Role;
 
 namespace Stokvel_Groups_Home_RSA.Controllers;
 
@@ -33,51 +38,49 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-
-
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            options.EnableSensitiveDataLogging();
-        });
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                   .EnableSensitiveDataLogging());
 
-
-
+        // Identity setup
         builder.Services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
+                     .AddEntityFrameworkStores<ApplicationDbContext>()
+                     .AddDefaultTokenProviders();
 
 
         builder.Services.AddSignalR();
 
-
-
-        builder.Services.AddTransient<IDepositService, DepositService>();
-
-
         builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-        builder.Services.AddTransient<IGroupRequestServices, GroupRequestServices>();
-
-
-        builder.Services.AddTransient<IAccountProfileRequestServices, AccountProfileServices>();
-        
-        builder.Services.AddTransient<WalletInfo>();
-        builder.Services.AddTransient<PreDepositInfo>();
-        builder.Services.AddTransient<IDepositSet, DepositSet>();
-        builder.Services.AddTransient<IPreDepositRequestServices, PreDepositInfo>();
-        builder.Services.AddTransient<IWalletRequestServices, WalletInfo>();
         //services
 
+        // Registering application services
+        builder.Services.AddTransient<IDepositService, DepositService>();
+
+        builder.Services.AddTransient<IDepositRequestServices, DepositRequest>();
+        builder.Services.AddTransient<IDepositRequestServices, PreDepositDepositRequest>();
+        builder.Services.AddTransient<IDepositRequestServices, WalletDepositRequest>();
+        builder.Services.AddTransient<IGroupRequestServices, GroupRequestServices>();
+        builder.Services.AddTransient<IAccountProfileRequestServices, AccountProfileServices>();
         builder.Services.AddTransient<IWithdrawServices, WithdrawServices>();
-        builder.Services.AddTransient<IWithdrawRequestService, WithdrawRequestService>();
         builder.Services.AddTransient<IAccountRequestServices, AccountRequestServices>();
-
         builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddTransient<IHomeRequestService, HomeRequestService>();
+        builder.Services.AddTransient<IAccountProfileRequestServices, AccountProfileServices>();
+        builder.Services.AddTransient<IGroupRequestServices, GroupRequestServices>();
+        builder.Services.AddTransient<IPreDepositRequestServices, PreDepositInfo>();
+        builder.Services.AddTransient<IWalletRequestServices, WalletInfo>();
+        builder.Services.AddTransient<IWithdrawRequestService, WithdrawRequestService>();
+        builder.Services.AddTransient<IWithdrawServices, WithdrawServices>();
+        builder.Services.AddTransient<IDepositSet, DepositSet>();
 
+        //Other dependencies
+        builder.Services.AddTransient<RoleSeeder>();
+        builder.Services.AddTransient<AdminSeeder>();
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
@@ -94,44 +97,37 @@ public class Program
             app.UseExceptionHandler("/Home/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
-
             app.UseMvcWithDefaultRoute();
-
         }
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
         app.UseRouting();
         app.UseAuthentication();
-
         app.UseAuthorization();
-
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}"
             );
+        app.MapHub<ChatHub>("ChatHub");
+        app.MapRazorPages();
 
-		app.MapHub<ChatHub>("ChatHub");
-
-
-		app.MapRazorPages();
-
-        using (var scope = app.Services.CreateScope())
+        try
         {
-            var roleManager =
-                    scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-            var roles = new[] { "Admin", "Manager", "SuperUser", "Member" };
-            foreach (var role in roles)
+            using (var scope = app.Services.CreateScope())
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                var roleSeeder = scope.ServiceProvider.GetRequiredService<RoleSeeder>();
+                var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+
+                await roleSeeder.CreateRolesAsync();
+                await adminSeeder.CreateAdminUserAsync();
             }
         }
-
-
-
+        catch (Exception ex)
+        {
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred during application startup.");
+        }
 
         app.Run();
     }

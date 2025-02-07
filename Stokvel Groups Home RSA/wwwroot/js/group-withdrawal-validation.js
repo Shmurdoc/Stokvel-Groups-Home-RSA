@@ -5,7 +5,7 @@ $(document).ready(function () {
     // Function to check and apply validation on account number based on selected payment method
     $("#paymentMethod").change(function () {
         var paymentMethod = $(this).val();
-        var accountNumberField = $("#accoutNumber");
+        var accountNumberField = $("#accountNumber");
 
         // Clear the previous validation
         accountNumberField.val('').removeAttr("pattern").removeAttr("title");
@@ -20,8 +20,8 @@ $(document).ready(function () {
         }
     });
 
-    $("#accoutNumber, #confirmAccountNumber").on("keyup", function () {
-        var accountNumber = $("#accoutNumber").val();
+    $("#accountNumber, #confirmAccountNumber").on("keyup", function () {
+        var accountNumber = $("#accountNumber").val();
         var confirmAccountNumber = $("#confirmAccountNumber").val();
 
         // Check if the two account numbers match
@@ -34,7 +34,7 @@ $(document).ready(function () {
 
     // Validate when the form is submitted
     $("form").submit(function (e) {
-        var accountNumber = $("#accoutNumber").val();
+        var accountNumber = $("#accountNumber").val();
         var confirmAccountNumber = $("#confirmAccountNumber").val();
 
         if (accountNumber !== confirmAccountNumber) {

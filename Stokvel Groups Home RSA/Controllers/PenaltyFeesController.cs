@@ -74,9 +74,10 @@ namespace Stokvel_Groups_Home_RSA.Controllers
 
 
         // GET: PenaltyFees/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["InvoiceId"] = new SelectList(_context.Invoices, "InvoiceId", "InvoiceId");
+            var invoices = await _unitOfWork.InvoicesRepository.GetAllAsync();
+            ViewData["InvoiceId"] = new SelectList(invoices, "InvoiceId", "InvoiceId");
             return View();
         }
 
@@ -85,32 +86,39 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PenaltyFeeId,InvoiceId,PenaltyDate,PenaltyAmount,PenaltyLevel")] PenaltyFee penaltyFee)
+        public async Task<IActionResult> Create([Bind("PenaltyFeeId,InvoiceId,PenaltyDate,PenaltyAmount,PenaltyLevel")] PenaltyFee? penaltyFee)
         {
+            if (penaltyFee == null)
+            {
+                return NotFound();
+            }
             if (ModelState.IsValid)
             {
-                _context.Add(penaltyFee);
-                await _context.SaveChangesAsync();
+                await _unitOfWork.PenaltyFeeRepository.Add(penaltyFee);
+                await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["InvoiceId"] = new SelectList(_context.Invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
+
+            var invoices = await _unitOfWork.InvoicesRepository.GetAllAsync();
+            ViewData["InvoiceId"] = new SelectList(invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
             return View(penaltyFee);
         }
 
         // GET: PenaltyFees/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.PenaltyFee == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var penaltyFee = await _context.PenaltyFee.FindAsync(id);
+            var penaltyFee = await _unitOfWork.PenaltyFeeRepository.GetByIdAsync(id);
             if (penaltyFee == null)
             {
                 return NotFound();
             }
-            ViewData["InvoiceId"] = new SelectList(_context.Invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
+            var invoices = await _unitOfWork.InvoicesRepository.GetAllAsync();
+            ViewData["InvoiceId"] = new SelectList(invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
             return View(penaltyFee);
         }
 
@@ -119,7 +127,7 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PenaltyFeeId,InvoiceId,PenaltyDate,PenaltyAmount,PenaltyLevel")] PenaltyFee penaltyFee)
+        public async Task<IActionResult> Edit(int id, [Bind("PenaltyFeeId,InvoiceId,PenaltyDate,PenaltyAmount,PenaltyLevel")] PenaltyFee? penaltyFee)
         {
             if (id != penaltyFee.PenaltyFeeId)
             {
@@ -130,12 +138,12 @@ namespace Stokvel_Groups_Home_RSA.Controllers
             {
                 try
                 {
-                    _context.Update(penaltyFee);
-                    await _context.SaveChangesAsync();
+                    _unitOfWork.PenaltyFeeRepository.Update(penaltyFee);
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PenaltyFeeExists(penaltyFee.PenaltyFeeId))
+                    if (await PenaltyFeeExists(penaltyFee.PenaltyFeeId))
                     {
                         return NotFound();
                     }
@@ -146,19 +154,20 @@ namespace Stokvel_Groups_Home_RSA.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["InvoiceId"] = new SelectList(_context.Invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
+            var invoices = await _unitOfWork.InvoicesRepository.GetAllAsync();
+            ViewData["InvoiceId"] = new SelectList(invoices, "InvoiceId", "InvoiceId", penaltyFee.InvoiceId);
             return View(penaltyFee);
         }
 
         // GET: PenaltyFees/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.PenaltyFee == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var penaltyFee = await _context.PenaltyFee
+            var penaltyFee = await _unitOfWork.PenaltyFeeRepository.GetList()
                 .Include(p => p.Invoice)
                 .FirstOrDefaultAsync(m => m.PenaltyFeeId == id);
             if (penaltyFee == null)
@@ -174,23 +183,24 @@ namespace Stokvel_Groups_Home_RSA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.PenaltyFee == null)
+            if (await _unitOfWork.PenaltyFeeRepository.GetByIdAsync(id) == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.PenaltyFee'  is null.");
             }
-            var penaltyFee = await _context.PenaltyFee.FindAsync(id);
+            var penaltyFee = await _unitOfWork.PenaltyFeeRepository.GetByIdAsync(id);
             if (penaltyFee != null)
             {
-                _context.PenaltyFee.Remove(penaltyFee);
+                await _unitOfWork.PenaltyFeeRepository.RemoveAsync(penaltyFee);
             }
             
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PenaltyFeeExists(int id)
+        private async Task<bool> PenaltyFeeExists(int id)
         {
-          return (_context.PenaltyFee?.Any(e => e.PenaltyFeeId == id)).GetValueOrDefault();
+            var result = await _unitOfWork.PenaltyFeeRepository.GetAllAsync();
+          return (result.Any(e => e.PenaltyFeeId == id));
         }
     }
 }

@@ -89,7 +89,7 @@
 				$Imagery.addClass("indicator");
 				var $Indicator = $(".indicator"),
 					$OpacityValue = checkOpacity(settings.addOpacity);
-
+					
 				$Imagery.on('click',function(){
 					//Calling the opacity function for action *_*
 					setOPACITY($OpacityValue,$Indicator,this);

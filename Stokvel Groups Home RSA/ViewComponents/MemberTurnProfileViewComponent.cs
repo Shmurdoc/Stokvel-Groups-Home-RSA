@@ -5,36 +5,38 @@ using Stokvel_Groups_Home_RSA.Interface.IRepo;
 using Stokvel_Groups_Home_RSA.Interface.IServices.IGroupServices;
 using Stokvel_Groups_Home_RSA.Models;
 using Stokvel_Groups_Home_RSA.Models.GroupedTables;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Stokvel_Groups_Home_RSA.ViewComponents;
 
 public class MemberTurnProfileViewComponent : ViewComponent
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IGroupRequestServices _groupRequestServices;
    
 
-    public MemberTurnProfileViewComponent(IUnitOfWork unitOfWork)
+    public MemberTurnProfileViewComponent(IUnitOfWork unitOfWork, IGroupRequestServices groupRequestServices)
     {
         _unitOfWork = unitOfWork;
+        _groupRequestServices = groupRequestServices;
     }
 
     [HttpGet]
     public async Task<IViewComponentResult> InvokeAsync(int groupId)
     {
+        string? monthState = "This";
         if (!int.TryParse(ViewData["GroupId"]?.ToString(), out groupId))
         {
             groupId = 0; // Default value if conversion fails
         }
 
         // Fetch deposits and include related entities
-        var deposits = await _unitOfWork.DepositRepository.GetList()
-            .Include(d => d.Invoices)
+        var depositsList = _unitOfWork.DepositRepository.GetList();
+
+         var deposits = depositsList.Include(d => d.Invoices)
                 .ThenInclude(i => i.Account)
                     .ThenInclude(a => a.ApplicationUser)
             .Where(d => d.Invoices.Any(i => i.Account.GroupId == groupId))
-            .ToListAsync();
+            .ToList();
 
         ViewBag.Deposit = deposits;
 
@@ -54,6 +56,18 @@ public class MemberTurnProfileViewComponent : ViewComponent
             .Distinct()
             .ToList();
 
+        if (accounts.Count == 0)
+        {
+            accounts = deposits
+            .SelectMany(d => d.Invoices)
+            .Where(i => i.Account.AccountQueueStart.Month == DateTime.Today.Month+1)
+            .Select(i => i.Account)
+            .Distinct()
+            .ToList();
+
+            monthState = "Next";
+        }
+
         // Get all invoices
         var invoices = deposits
             .Where(x => x.DepositReference == "Deposit" + accounts
@@ -62,6 +76,7 @@ public class MemberTurnProfileViewComponent : ViewComponent
                 .SingleOrDefault())
             .SelectMany(d => d.Invoices)
             .ToList();
+
 
         // Get member deposits
         var memberDeposits = deposits.ToList();
@@ -83,6 +98,10 @@ public class MemberTurnProfileViewComponent : ViewComponent
         var userId = User.Identity.GetUserId();
 
         // ViewBag Area
+
+        // Get which month has a member
+        ViewBag.NextMonth = monthState;
+
         // Get deposited amount
         ViewBag.DepositedAmount = invoices
             .Where(x => x.Account.Id == userId)
@@ -99,6 +118,7 @@ public class MemberTurnProfileViewComponent : ViewComponent
             invoices.Where(x => x.Account.Id == userId).ToList(),
             groupId
         );
+
 
         // Get target amount
         ViewBag.TargetAmount = await TargetAmount(groupId);
@@ -131,7 +151,7 @@ public class MemberTurnProfileViewComponent : ViewComponent
 
     public async Task<decimal> TargetAmount(int groupId)
     {
-		return await _unitOfWork.GroupRequestServices.CalculateAmountTarget(groupId);
+		return await _groupRequestServices.CalculateAmountTarget(groupId);
 	}
 
 

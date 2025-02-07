@@ -10,10 +10,12 @@ namespace Stokvel_Groups_Home_RSA.ViewComponents
     public class DailyGroupUpdateViewComponent : ViewComponent
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHomeRequestService _homeRequestService;
 
-        public DailyGroupUpdateViewComponent(IUnitOfWork unitOfWork)
+        public DailyGroupUpdateViewComponent(IUnitOfWork unitOfWork, IHomeRequestService homeRequestService)
         {
             _unitOfWork = unitOfWork;
+            _homeRequestService = homeRequestService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -22,8 +24,8 @@ namespace Stokvel_Groups_Home_RSA.ViewComponents
             List<Deposit> displayDisplayRecentDeposit = new();
             var account = await _unitOfWork.AccountsRepository.GetAllAsync(u => u.Id == userId, includeProperties: "ApplicationUser");
             var groupId = account.Where(x => x.Accepted == true).Select(x => x.GroupId).ToList();
-            var memberList = await _unitOfWork.HomeRequestService.GetApplicationAccountDetailsAsync(groupId[0]);
-            var groupMembers = await _unitOfWork.HomeRequestService.GetDepositDetailsAsync(groupId[0]);
+            var memberList = await _homeRequestService.GetApplicationAccountDetailsAsync(groupId[0]);
+            var groupMembers = await _homeRequestService.GetDepositDetailsAsync(groupId[0]);
             
             var order = groupMembers.OrderBy(x => x.DepositDate).Take(5).ToList();
 
